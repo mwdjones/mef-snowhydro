@@ -165,12 +165,12 @@ save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/
 
 #Individual depth plots at each time
 for t in times:
-    snow_s6.depths.sel(time = t).plot.contourf()
+    snow_s6.depths.sel(time = t).plot.contourf(vmin = 0, vmax = float(snow_s6.depths.max()))
     plt.savefig(save_path + "S6_snowdepths_" + str(t) + ".pdf")
     plt.savefig(save_path + "S6_snowdepths_" + str(t) + ".jpg")
     plt.show()
 
-    snow_s2.depths.sel(time = t).plot.contourf()
+    snow_s2.depths.sel(time = t).plot.contourf(vmin = 0, vmax = float(snow_s2.depths.max()))
     plt.savefig(save_path + "S2_snowdepths_" + str(t) + ".pdf")
     plt.savefig(save_path + "S2_snowdepths_" + str(t) + ".jpg")
     plt.show()
@@ -186,11 +186,27 @@ plt.savefig(save_path + "S2_snowdepths_time.pdf")
 plt.savefig(save_path + "S2_snowdepths_time.jpg")
 plt.show()
 
-# %%
-
+#%%
 '''SAVE DATA'''
 
 data_savepath = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
 
 snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')
 snow_s6.to_netcdf(data_savepath + '01_cleanedsnowdataS6.nc')
+
+
+#%%
+'''FUN LITTLE ANIMATION'''
+import imageio
+
+with imageio.get_writer(save_path + 's2snow.gif', mode = 'i', fps = 4) as writer:
+    for i in times:
+        image = imageio.imread(save_path + f'S2_snowdepths_{i}.jpg')
+        writer.append_data(image)
+
+
+with imageio.get_writer(save_path + 's6snow.gif', mode = 'i', fps = 4) as writer:
+    for i in times:
+        image = imageio.imread(save_path + f'S6_snowdepths_{i}.jpg')
+        writer.append_data(image)
+# %%
