@@ -29,7 +29,25 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [26, 32, 40, 22, 23, 19],
             [np.nan, 29, 29, 40, 20, 20],
             [np.nan, np.nan, 22, 31, 38, 29],
-            [np.nan, np.nan, np.nan, 22, 26, 18]]]
+            [np.nan, np.nan, np.nan, 22, 26, 18]], 
+            [[np.nan, 32.5, 36.5, np.nan, np.nan, np.nan],
+            [27.5, 36, 25, 27, 28, np.nan],
+            [28, 36, 40, 26, 24, 22],
+            [np.nan, 34, 35, 31, 23, 23],
+            [np.nan, np.nan, 22, 31.5, 38, 30],
+            [np.nan, np.nan, np.nan, 25, 27, 20.5]], 
+            [[np.nan, 28, 37, np.nan, np.nan, np.nan],
+            [29, 37, 33, 32, 34, np.nan],
+            [34, 43, 45, 30, 26, 22],
+            [np.nan, 37, 39, 29, 26, 24],
+            [np.nan, np.nan, 30, 38, 39, 29],
+            [np.nan, np.nan, np.nan, 25, 32, 22]], 
+            [[np.nan, 34, 35, np.nan, np.nan, np.nan],
+            [27, 35, 31, 28, 36, np.nan],
+            [28, 40, 47, 25, 26, 23],
+            [np.nan, 32, 36, 43, 23, 27],
+            [np.nan, np.nan, 24, 37, 41, 33],
+            [np.nan, np.nan, np.nan, 22, 32, 23]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, np.nan, 11, np.nan],
@@ -54,11 +72,29 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [29, 26, 38.5, 33, 33, 45, 34],
             [np.nan, np.nan, 32, 28, 35, 33, 33],
             [np.nan, np.nan, np.nan, 34, 38, 36, 37],
-            [np.nan, np.nan, np.nan, np.nan, 32, 30, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 32, 30, np.nan]], 
+            [[40, 40, 28.5, 29, 25, 33.5, np.nan],
+            [np.nan, 43.5, 32, 47, 36, 43.5, np.nan],
+            [40.5, 28.5, 41.5, 44.5, 46, 42, 40],
+            [np.nan, np.nan, 37, 43, 36, 49.5, 42],
+            [np.nan, np.nan, np.nan, 33.5, 40.5, 37.5, 36],
+            [np.nan, np.nan, np.nan, np.nan, 38.5, 36, np.nan]], 
+            [[np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]], 
+            [[43, 39, 27, 32, 25, 38, np.nan],
+            [np.nan, 41, 36, 31, 38, 48, np.nan],
+            [41, 31, 43, 46, 39, 56, 40],
+            [np.nan, np.nan, 41, 45, 41, 42, 43],
+            [np.nan, np.nan, np.nan, 43, 46, 44, 44],
+            [np.nan, np.nan, np.nan, np.nan, 39, 38, np.nan]]]
 
 '''Times'''
 #Add dates as needed
-times = np.array(['12-02-2022', '12-30-2022', '01-05-2023', '01-13-2023'])
+times = np.array(['12-02-2022', '12-30-2022', '01-05-2023', '01-13-2023', '01-20-2023', '02-01-2023', '02-10-2023'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
@@ -125,7 +161,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Figures/snowPlots/'
+save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
@@ -140,14 +176,21 @@ for t in times:
     plt.show()
     
 #Depth plots wrapped by time
-snow_s6.depths.plot.contourf(col = 'time')
+snow_s6.depths.plot.contourf(col = 'time', col_wrap = 3)
 plt.savefig(save_path + "S6_snowdepths_time.pdf")
 plt.savefig(save_path + "S6_snowdepths_time.jpg")
+plt.show()
 
-snow_s2.depths.plot.contourf(col = 'time')
+snow_s2.depths.plot.contourf(col = 'time', col_wrap = 3)
 plt.savefig(save_path + "S2_snowdepths_time.pdf")
 plt.savefig(save_path + "S2_snowdepths_time.jpg")
+plt.show()
 
-#time plots
-#snow_s2.sel(easting = 5262500).plot.line(x = "time")
 # %%
+
+'''SAVE DATA'''
+
+data_savepath = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
+
+snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')
+snow_s6.to_netcdf(data_savepath + '01_cleanedsnowdataS6.nc')
