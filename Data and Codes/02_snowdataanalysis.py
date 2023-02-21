@@ -55,10 +55,12 @@ sns.kdeplot(data = s2data_df,
     x = 'depths', 
     hue = 'zones', 
     palette = 'rocket_r', 
-    #multiple = 'fill', 
-    fill = True)
+    multiple = 'fill' 
+    #fill = True
+    )
 
 ax1.set_xlabel('Snow depth [cm]')
+ax1.set_ylim(0, 1)
 sns.move_legend(ax1, "upper left")
 
 #time series
@@ -74,12 +76,13 @@ sns.lineplot(data = s2data_df,
     )
 
 ax2.set_xlim('12-02-2022', '02-10-2023')
+ax2.set_ylim(0, 50)
 ax2.set_xlabel('Time')
 ax2.set_ylabel('Snow depth [cm]')
 
 plt.xticks(rotation=30)
 plt.suptitle('Snow Depths in S2')
-plt.savefig(save_path + 's2_kde_timeseries.pdf')
+plt.savefig(save_path + 's2_kde_fill_timeseries.pdf')
 plt.show()
 
 #S6
@@ -95,10 +98,11 @@ sns.kdeplot(data = s6data_df,
     x = 'depths', 
     hue = 'zones', 
     palette = 'rocket_r', 
-    fill = True
+    multiple = 'fill'
     )
 
 ax1.set_xlabel('Snow depth [cm]')
+ax1.set_ylim(0, 1)
 sns.move_legend(ax1, "upper left")
 
 #time series
@@ -114,12 +118,13 @@ sns.lineplot(data = s6data_df,
     )
 
 ax2.set_xlim('12-02-2022', '02-10-2023')
+ax2.set_ylim(0, 50)
 ax2.set_xlabel('Time')
 ax2.set_ylabel('Snow depth [cm]')
 
 plt.xticks(rotation=30)
 plt.suptitle('Snow Depths in S6')
-plt.savefig(save_path + 's6_kde_timeseries.pdf')
+plt.savefig(save_path + 's6_kde_fill_timeseries.pdf')
 plt.show()
 
 
