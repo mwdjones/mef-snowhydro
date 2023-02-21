@@ -136,7 +136,7 @@ zones_s2 = [['Upland', 'Upland', 'Upland', 'Upland', 'Upland', 'Upland', np.nan]
 
 snow_s6 = xr.Dataset(
     data_vars = {"stakes": (["northing", "easting"], stakes_s6),
-                 "zones": (["norting", "easting"], zones_s6),
+                 "zones": (["northing", "easting"], zones_s6),
                  "depths": (["time", "northing", "easting"], data_s6),
     },
     coords={
@@ -189,7 +189,7 @@ plt.show()
 #%%
 '''SAVE DATA'''
 
-data_savepath = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
+data_savepath = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
 
 snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')
 snow_s6.to_netcdf(data_savepath + '01_cleanedsnowdataS6.nc')
