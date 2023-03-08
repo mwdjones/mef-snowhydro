@@ -47,7 +47,19 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [28, 40, 47, 25, 26, 23],
             [np.nan, 32, 36, 43, 23, 27],
             [np.nan, np.nan, 24, 37, 41, 33],
-            [np.nan, np.nan, np.nan, 22, 32, 23]]]
+            [np.nan, np.nan, np.nan, 22, 32, 23]], 
+            [[np.nan, 27, 33, np.nan, np.nan, np.nan],
+            [27, 27, 32, 27, 34, np.nan],
+            [26, 35, 52, 23, 23, 21],
+            [np.nan, 36, 30, 44, 18, 24],
+            [np.nan, np.nan, 20, 25, 43, 26],
+            [np.nan, np.nan, np.nan, 16, 11, 20]], 
+            [[np.nan, 35, 41, np.nan, np.nan, np.nan],
+            [34, 41, 32, 29, 42, np.nan],
+            [25, 44, 54, 30, 28, 26],
+            [np.nan, 33, 40, 48, 18, 30],
+            [np.nan, np.nan, 26, 40, 59, 25],
+            [np.nan, np.nan, np.nan, 23, 33, 25]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, np.nan, 11, np.nan],
@@ -90,11 +102,23 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [41, 31, 43, 46, 39, 56, 40],
             [np.nan, np.nan, 41, 45, 41, 42, 43],
             [np.nan, np.nan, np.nan, 43, 46, 44, 44],
-            [np.nan, np.nan, np.nan, np.nan, 39, 38, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 39, 38, np.nan]], 
+            [[29, 34, 26, 28, 15, 35, np.nan],
+            [np.nan, 51, 28, 37, 36, 38, np.nan],
+            [44, np.nan, 30, 37, 39, 47, 35],
+            [np.nan, np.nan, 39, 41, 49, 42, 40],
+            [np.nan, np.nan, np.nan, 40, 45, 42, 40],
+            [np.nan, np.nan, np.nan, np.nan, 37, 32, np.nan]], 
+            [[45, 41, 32, 42, 31, 44, np.nan],
+            [np.nan, 50, 41, 52, 30, 52, np.nan],
+            [52, 38, 49, 52, 46, 53, 44],
+            [np.nan, np.nan, 52, 49, 61, 56, 46],
+            [np.nan, np.nan, np.nan, 44, 49, 48, 50],
+            [np.nan, np.nan, np.nan, np.nan, 44, 46, np.nan]]]
 
 '''Times'''
 #Add dates as needed
-times = np.array(['12-02-2022', '12-30-2022', '01-05-2023', '01-13-2023', '01-20-2023', '02-01-2023', '02-10-2023'])
+times = np.array(['12-02-2022', '12-30-2022', '01-05-2023', '01-13-2023', '01-20-2023', '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
@@ -109,9 +133,9 @@ stakes_s6 = [[np.nan, 'S655', 'S654', np.nan, np.nan, np.nan],
             [np.nan, np.nan, np.nan, 'S603', 'S602', 'S601']]
 
 zones_s6 = [[np.nan, 'Upland', 'Upland', np.nan, np.nan, np.nan],
-            ['Upland', 'Bog', 'Lagg', 'Upland', 'Upland', np.nan], #s644 should be lagg - diff from Kristina LAI analysis
+            ['Upland', 'Bog', 'Upland', 'Upland', 'Upland', np.nan], #s644 should be lagg - diff from Kristina LAI analysis
             ['Upland', 'Lagg', 'Bog', 'Lagg', 'Upland', 'Upland'],
-            [np.nan, 'Upland', 'Lagg', 'Bog', 'Lagg', 'Lagg'], #s621 should be lagg - diff from Kristina LAI analysis
+            [np.nan, 'Upland', 'Lagg', 'Bog', 'Lagg', 'Upland'], #s621 should be lagg - diff from Kristina LAI analysis
             [np.nan, np.nan, 'Upland', 'Lagg', 'Bog', 'Lagg'],
             [np.nan, np.nan, np.nan, 'Upland', 'Upland', 'Upland']]
 
@@ -161,7 +185,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
+save_path = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
