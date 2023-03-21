@@ -62,7 +62,7 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [np.nan, np.nan, np.nan, 23, 33, 25]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
-            [np.nan, 11, 5, 19, np.nan, 11, np.nan],
+            [np.nan, 11, 5, 19, 13, 11, np.nan], #interpolated value (13)
             [14.5, 5, 14, 14.5, 5, 8, 8.5],
             [np.nan, np.nan, 9, 10, 9.5, 14, 11],
             [np.nan, np.nan, np.nan, 5.5, 8, 9, 4],

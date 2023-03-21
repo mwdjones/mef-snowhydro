@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#%%
 """
 Created on Tue Oct 25 13:53:12 2022
 
@@ -18,14 +19,18 @@ import scipy
 #%%
 
 '''DATA IMPORT'''
-filepath = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Data and Codes/Raw Data/"
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Figures/laiPlots/'
+filepath = "E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
+save_path = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/'
 s2LAI_import = pd.read_csv(filepath + "S2_summerLAI.txt", sep = ';')
 s6LAI_import = pd.read_csv(filepath + "S6_summerLAI.txt", sep = ';')
+
+s2LAI_winter_import = pd.read_csv(filepath + "S2_winterLAI.txt", sep = ';')
 
 #Trim colnames
 s2LAI_import.columns =[col.strip() for col in s2LAI_import.columns]
 s6LAI_import.columns =[col.strip() for col in s6LAI_import.columns]
+
+s2LAI_winter_import.columns =[col.strip() for col in s2LAI_winter_import.columns]
 
 #Subset columns of interest
 nameDict = {"User Field 1":"Stake", "User Field 2":"Orientation", "User Field 3":"Zone"}
@@ -34,23 +39,36 @@ s2LAI = s2LAI.rename(columns = nameDict)
 s6LAI = s6LAI_import[["User Field 1", "User Field 2", "User Field 3", "% Sky Area", "% Mask Area", "% Cnpy Open", "% Site Open", "LAI 4Ring", "LAI 5Ring", "Date", "Time"]]
 s6LAI = s6LAI.rename(columns = nameDict)
 
+s2LAI_winter = s2LAI_winter_import[["User Field 1", "User Field 2", "User Field 3", "% Sky Area", "% Mask Area", "% Cnpy Open", "% Site Open", "LAI 4Ring", "LAI 5Ring", "Date", "Time"]]
+s2LAI_winter = s2LAI_winter.rename(columns = nameDict)
+
 #Separate stake values into new column
 s2LAI['Stake_ID'] = [name[0:4] for name in s2LAI.Stake]
 s6LAI['Stake_ID'] = [name[0:4] for name in s6LAI.Stake]
+
+s2LAI_winter['Stake_ID'] = [name[0:4] for name in s2LAI_winter.Stake]
 
 ###Groupby
 #Group numerical values
 s2LAI_groupednums = pd.DataFrame(s2LAI.groupby(["Stake_ID"], as_index = False).mean()) #Takes the mean of each variable, drops Date, Time, Orientation, and Zone because they are not ints
 s6LAI_groupednums = pd.DataFrame(s6LAI.groupby(["Stake_ID"], as_index = False).mean()) #Takes the mean of each variable, drops Date, Time, Orientation, and Zone because they are not ints
+
+s2LAI_winter_groupednums = pd.DataFrame(s2LAI_winter.groupby(["Stake_ID"], as_index = False).mean()) #Takes the mean of each variable, drops Date, Time, Orientation, and Zone because they are not ints
 #Group string values
 s2LAI_groupednames = pd.DataFrame(s2LAI.groupby(["Stake_ID"], as_index = False)['Zone'].max())
 s6LAI_groupednames = pd.DataFrame(s6LAI.groupby(["Stake_ID"], as_index = False)['Zone'].max())
+
+s2LAI_winter_groupednames = pd.DataFrame(s2LAI_winter.groupby(["Stake_ID"], as_index = False)['Zone'].max())
+
 #Merge
 s2LAI_grouped = s2LAI_groupednames.merge(s2LAI_groupednums, how = 'outer')
 s6LAI_grouped = s6LAI_groupednames.merge(s6LAI_groupednums, how = 'outer')
 
+s2LAI_winter_grouped = s2LAI_winter_groupednames.merge(s2LAI_winter_groupednums, how = 'outer')
+
+
 #%%
-'''PLOTS ANALYSIS'''
+'''PLOTS ANALYSIS - SUMMER'''
 
 ###LAI4 and LAI5 comparison by stake
 fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(3.5, 5.5),
@@ -165,11 +183,65 @@ ax.add_artist(at)
 plt.suptitle("LAI Ring 4 by Peatland")
 plt.savefig(save_path + "LAI_ring4_peat.pdf")
 
+#%%
+
+'''PLOT ANALYSIS - WINTER'''
+
+###LAI4 and LAI5 comparison by stake
+fig, ax1 = plt.subplots(ncols=1, nrows=1, figsize=(5, 3),
+                        layout="constrained")
+#S2
+ax1.plot(s2LAI_winter_grouped['Stake_ID'], s2LAI_winter_grouped['LAI 4Ring'])
+ax1.plot(s2LAI_winter_grouped['Stake_ID'], s2LAI_winter_grouped['LAI 5Ring'], linestyle = '--')
+ax1.tick_params(axis = 'x', rotation = 90)
+at = offsetbox.AnchoredText(
+    "S2", prop=dict(size=15), frameon=True, loc='lower right')
+at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
+ax1.add_artist(at)
+ax1.set_ylabel('LAI')
+
+
+plt.suptitle("LAI Ring 4 and 5 data in S2 and S6, Winter")
+plt.savefig(save_path + "LAI_winter_ring4_5_comp.pdf")
+
+###Boxplot of LAI4 values by zone
+fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(3.5, 5.5),
+                        layout="constrained")
+
+#S2 LAI4
+sns.boxplot(data = s2LAI_winter_grouped, x = 'Zone', y = 'LAI 4Ring',
+    notch=False, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .5)},
+    medianprops={"color": "red"},
+    ax = ax1)
+ax1.set_ylabel('LAI Ring 4')
+at = offsetbox.AnchoredText(
+    "S2", prop=dict(size=15), frameon=True, loc='lower right')
+at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
+ax1.add_artist(at)
+
+#S2 LAI5
+sns.boxplot(data = s2LAI_winter_grouped, x = 'Zone', y = 'LAI 5Ring',
+    notch=False, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .5)},
+    medianprops={"color": "red"},
+    ax = ax2)
+ax2.set_ylabel('LAI Ring 5')
+at = offsetbox.AnchoredText(
+    "S2", prop=dict(size=15), frameon=True, loc='lower right')
+at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
+ax2.add_artist(at)
+
+plt.suptitle("LAI in S2 by peatland zone")
+plt.savefig(save_path + "LAI_winter_peatZone.pdf")
+
 
 
 #%%
 
-'''STATISTICAL ANALYSIS'''
+'''STATISTICAL ANALYSIS - SUMMER'''
 #Trim zone names
 s2LAI_grouped.Zone =[col.strip() for col in s2LAI_grouped.Zone]
 s6LAI_grouped.Zone =[col.strip() for col in s6LAI_grouped.Zone]
@@ -248,6 +320,53 @@ watershed_ANOVA = scipy.stats.f_oneway(s2LAI_grouped['LAI 4Ring'],
 print(watershed_ANOVA)
 ###
 # F_onewayResult(statistic=1.0373695573879274, pvalue=0.3133371801498456) - Not significant at 0.05
+###
+
+# %%
+
+'''STAISTICAL ANALYSIS - WINTER'''
+
+#Trim zone names
+s2LAI_winter_grouped.Zone =[col.strip() for col in s2LAI_winter_grouped.Zone]
+
+#Sort into sets
+s2upland = s2LAI_winter_grouped[s2LAI_winter_grouped.Zone == 'Upland']
+s2lagg = s2LAI_winter_grouped[s2LAI_winter_grouped.Zone == 'Lagg']
+s2bog = s2LAI_winter_grouped[s2LAI_winter_grouped.Zone == 'Bog']
+
+###One-way ANOVA on Zones
+#Run
+s2_winter_ANOVA = scipy.stats.f_oneway(s2upland['LAI 4Ring'], 
+    s2bog['LAI 4Ring'], 
+    s2lagg['LAI 4Ring'])
+
+#Print results
+print(s2_winter_ANOVA)
+###
+#F_onewayResult(statistic=12.543262986078133, pvalue=0.0001689424295302482) -- Significant at 0.05
+###
+
+
+###Tukey test on Zones
+#Run
+s2_winter_Tukey = scipy.stats.tukey_hsd(s2upland['LAI 4Ring'], 
+    s2bog['LAI 4Ring'], 
+    s2lagg['LAI 4Ring'])
+
+
+#Print results
+print(s2_winter_Tukey)
+###
+# 0-1 and 1-0 (i.e. upland and bog) are signifcant at 0.05
+# 0-2 and 2-0 (i.e. upland and lagg) are significant at 0.1
+#Tukey's HSD Pairwise Group Comparisons (95.0% Confidence Interval)
+#Comparison  Statistic  p-value  Lower CI  Upper CI
+# (0 - 1)     -1.082     0.000    -1.633    -0.530
+# (0 - 2)     -0.529     0.062    -1.080     0.022
+# (1 - 0)      1.082     0.000     0.530     1.633
+# (1 - 2)      0.553     0.117    -0.112     1.218
+# (2 - 0)      0.529     0.062    -0.022     1.080
+# (2 - 1)     -0.553     0.117    -1.218     0.112
 ###
 
 # %%

@@ -17,7 +17,6 @@ import numpy as np
 import seaborn as sns
 import scipy
 import xarray as xr
-import seaborn.objects as so
 
 #%%
 
@@ -45,7 +44,7 @@ data_all = pd.concat([s2data_df, s6data_df], ignore_index = True)
 '''DATA IMPORT'''
 filepath = "E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
 save_path_lai = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/'
-s2LAI_import = pd.read_csv(filepath + "S2_summerLAI.txt", sep = ';')
+s2LAI_import = pd.read_csv(filepath + "S2_winterLAI.txt", sep = ';')
 s6LAI_import = pd.read_csv(filepath + "S6_summerLAI.txt", sep = ';')
 
 #Trim colnames
@@ -83,6 +82,8 @@ s6LAI_grouped.Zone =[col.strip() for col in s6LAI_grouped.Zone]
 '''Plots'''
 
 #%%
+
+custom_pal = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
 ###Plot winter snow timeseries
 ###S2
 fig = plt.figure(constrained_layout = True, 
@@ -95,7 +96,7 @@ ax1 = fig.add_subplot(gs[0, 0])
 sns.kdeplot(data = s2data_df, 
     x = 'depths', 
     hue = 'zones', 
-    palette = 'rocket_r', 
+    palette = custom_pal, 
     #multiple = 'fill' 
     fill = True
     )
@@ -110,8 +111,8 @@ sns.lineplot(data = s2data_df,
     x = 'time',
     y = 'depths',
     hue = 'zones', 
-    errorbar = 'ci', 
-    palette = 'rocket_r', 
+    #errorbar = 'ci', 
+    palette = custom_pal, 
     ax = ax2, 
     legend = False
     )
@@ -137,7 +138,7 @@ ax1 = fig.add_subplot(gs[0, 0])
 sns.kdeplot(data = s6data_df, 
     x = 'depths', 
     hue = 'zones', 
-    palette = 'rocket_r', 
+    palette = custom_pal, 
     #multiple = 'fill', 
     fill = True
     )
@@ -152,8 +153,8 @@ sns.lineplot(data = s6data_df,
     x = 'time',
     y = 'depths',
     hue = 'zones', 
-    errorbar = 'ci', 
-    palette = 'rocket_r', 
+ #   errorbar = 'ci', 
+    palette = custom_pal, 
     ax = ax2, 
     legend = False
     )
@@ -192,6 +193,11 @@ for t in set(s2data_df.time):
         #Sort so stakes match
         snow_subset.sort_values('stakes')
 
+        #Remove two cases for now -- add back in when Kristina sends LAI data
+        if z == 'Upland':
+            snow_subset = snow_subset[snow_subset["stakes"].str.contains("S214") == False]
+  
+
         #Subset
         lai_subset = s2LAI_grouped[s2LAI_grouped.Zone == z]
         #Sort so stakes match
@@ -205,6 +211,7 @@ for t in set(s2data_df.time):
 
         #Loop through the available times
 
+'''
 #S6       
 for t in set(s6data_df.time):
     #Loop through regions
@@ -230,7 +237,7 @@ for t in set(s6data_df.time):
         #Append to dataframe
         lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'watershed': ['S6']})])
 
-
+'''
 #Plot
 sns.set_style('white')
 fig, axs = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
@@ -240,19 +247,79 @@ for t in set(lai_corr.time):
     axs.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
 
 sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['corr'],
-    hue = lai_corr['zone'], 
-    style = lai_corr['watershed'],
-    palette = 'rocket_r', 
-    ax = axs)
+   hue = lai_corr['zone'], 
+   style = lai_corr['watershed'],
+   palette = custom_pal, 
+   s = 80,
+   linewidth = 0,
+   ax = axs)
 
 plt.xticks(rotation=30)
-plt.legend(loc = 'upper right')
+#plt.legend(loc = 'upper right')
 
 axs.set_ylim(0, 1)
 axs.set_xlabel(' ')
 axs.set_ylabel(r'4Ring LAI and Snow Depth $R^2$')
+axs.yaxis.set_label_position("right")
+axs.yaxis.tick_right()
 
 plt.savefig(save_path_lai + 'lai_SD_correlations.pdf')
+plt.show()
+
+#%%
+#Plot sample individual corrplots
+fig, [ax1, ax2, ax3] = plt.subplots(ncols=1, nrows=3, figsize=(3, 9),
+                        layout="constrained"
+                        )
+
+#select data for time
+snow_time_subset = s2data_df[s2data_df.time == '02-24-2023']
+
+#quick patch
+snow_time_subset.depths[11] = 13
+
+#TIME = 2022-12-01, Bog
+ax1_R = calc_corr(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring'],
+                  snow_time_subset[snow_time_subset.zones == 'Bog']['depths'])
+sns.regplot(x = s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring'],
+                 y = snow_time_subset[snow_time_subset.zones == 'Bog']['depths'], 
+                 ax = ax1, 
+                 color = custom_pal[1])
+ax1.set_xlim(min(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring']), 
+             max(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring']))
+#ax1.set_ylim(0, 25)
+ax1.set_ylabel('Snow depth [cm]')
+#ax1.text(1.9, 22, r'$R^2$ = %.2f' % ax1_R)
+
+#TIME = 2022-12-01, Upland
+x = s2LAI_grouped[(s2LAI_grouped.Zone == 'Upland')]['LAI 4Ring']
+y = snow_time_subset[(snow_time_subset.zones == 'Upland') & (snow_time_subset['stakes'].str.contains('S214') == False)]['depths']
+
+ax2_R = calc_corr(x,y)
+sns.regplot(x = x,
+                 y = y, 
+                 ax = ax2, 
+                 color = custom_pal[0])
+ax2.set_xlim(min(x), 
+             max(x))
+#ax2.set_ylim(0, 25)
+ax2.set_ylabel('Snow depth [cm]')
+#ax2.text(1.5, 22, r'$R^2$ = %.2f' % ax2_R)
+
+#TIME = 2022-12-01, Lagg
+ax3_R = calc_corr(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring'],
+                  snow_time_subset[snow_time_subset.zones == 'Lagg']['depths'])
+sns.regplot(x = s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring'],
+                 y = snow_time_subset[snow_time_subset.zones == 'Lagg']['depths'], 
+                 ax = ax3, 
+                 color = custom_pal[2])
+ax3.set_xlim(min(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring']), 
+             max(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring']))
+#ax3.set_ylim(0, 25)
+ax3.set_ylabel('Snow depth [cm]')
+#ax3.text(1.5, 22, r'$R^2$ = %.2f' % ax3_R)
+
+plt.savefig(save_path_lai + 'sampCorrPlots.pdf')
 plt.show()
 
 # %%
@@ -299,9 +366,11 @@ for idx,row in frost.iterrows():
 fig, axs = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
                         layout="constrained")
 
-sns.swarmplot(x = frost['DATE'], y = frost['FROST.1'],
+sns.boxplot(x = frost['DATE'].dt.date, y = frost['FROST.1'],
     hue = frost['Zones'], 
-    palette = 'rocket_r', 
+    palette = custom_pal, 
+    boxprops={"edgecolor": "white",
+                "linewidth": 0.5},
     ax = axs)
 
 axs.set_xlabel(' ')
