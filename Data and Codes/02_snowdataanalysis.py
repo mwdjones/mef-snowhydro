@@ -173,16 +173,20 @@ plt.show()
 # %%
 # Plot summer LAI 
 
-def calc_corr(x, y):
+def calc_corr(x, y, return_slope = False):
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x, y)
-    return r_value**2
+    
+    if(return_slope):
+        return slope, r_value**2
+    else:
+        return r_value**2
 
 #Remove rows with NANs in the Zone column
 s2data_df = s2data_df.dropna(subset = ['zones'])
 s6data_df = s6data_df.dropna(subset = ['zones'])
 
 #Declare dataframe
-lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'watershed' : []})
+lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
 
 #Loop through the available times
 for t in set(s2data_df.time):
@@ -204,10 +208,10 @@ for t in set(s2data_df.time):
         lai_subset.sort_values('Stake_ID')
   
         #Calculate the correlation between the snowdepths and the LAI
-        r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'])
+        slope, r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'], return_slope = True)
 
         #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'watershed': ['S2']})])
+        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S2']})])
 
         #Loop through the available times
 
@@ -240,11 +244,12 @@ for t in set(s6data_df.time):
 '''
 #Plot
 sns.set_style('white')
-fig, axs = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
+fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(5.5, 7),
                         layout="constrained")
 
+#R^2 values
 for t in set(lai_corr.time):
-    axs.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
+    ax1.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
 
 sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['corr'],
    hue = lai_corr['zone'], 
@@ -252,16 +257,37 @@ sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['corr'],
    palette = custom_pal, 
    s = 80,
    linewidth = 0,
-   ax = axs)
+   ax = ax1)
 
 plt.xticks(rotation=30)
 #plt.legend(loc = 'upper right')
 
-axs.set_ylim(0, 1)
-axs.set_xlabel(' ')
-axs.set_ylabel(r'4Ring LAI and Snow Depth $R^2$')
-axs.yaxis.set_label_position("right")
-axs.yaxis.tick_right()
+ax1.set_ylim(0, 1)
+ax1.set_xlabel(' ')
+ax1.set_ylabel(r'4Ring LAI and Snow Depth $R^2$')
+ax1.yaxis.set_label_position("right")
+ax1.yaxis.tick_right()
+
+#Slope values
+for t in set(lai_corr.time):
+    ax2.vlines(pd.to_datetime(t), ymin = -0.5, ymax = 0.5, colors = 'silver', zorder = 1)
+
+sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['slope'],
+   hue = lai_corr['zone'], 
+   style = lai_corr['watershed'],
+   palette = custom_pal, 
+   s = 80,
+   linewidth = 0,
+   ax = ax2)
+
+plt.xticks(rotation=30)
+#plt.legend(loc = 'upper right')
+
+ax2.set_ylim(-0.1, 0.1)
+ax2.set_xlabel(' ')
+ax2.set_ylabel(r'4Ring LAI and Snow Depth $\beta$')
+ax2.yaxis.set_label_position("right")
+ax2.yaxis.tick_right()
 
 plt.savefig(save_path_lai + 'lai_SD_correlations.pdf')
 plt.show()

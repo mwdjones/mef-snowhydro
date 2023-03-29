@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Tue Oct 25 13:53:12 2022
 
 
 @author: marie
 """
+
+#%%
 
 '''PACKAGE IMPORTS'''
 #For data analysis
@@ -20,13 +23,28 @@ import os
 #For datetime 
 import datetime
 
+#%%
+
 '''PROBE DATA IMPORT'''
-directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Data and Codes/Raw Data/GroPoint/'
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Figures/soilPlots/'
+#Soil Data from Gropoint sensors
+directory = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/GroPoint/'
+save_path = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/soilPlots/'
 all_files = glob.glob(os.path.join(directory, 'S*.txt'))
+
+#Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
+precip_directory = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
+precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv', 
+                     na_values = ['T', 'M'], 
+                     parse_dates = ['Date'], 
+                     names = ['Date', 'Tmax_F', 'Tmin_F', 'P_in', 'Snow_in', 'SnowDepth_in'], 
+                     header = 0, 
+                     dtype = {'P_in':float, 'Snow_in':float, 'SnowDepth_in':float})
 
 #For timestamp rounding 
 dt_format = "%Y-%m-%d %H:%M"
+
+#%%
+'''FUNCTIONS'''
 
 def roundTime(dt=None, roundTo=60):
    """Round a datetime object to any time lapse in seconds
@@ -39,35 +57,56 @@ def roundTime(dt=None, roundTo=60):
    rounding = (seconds+roundTo/2) // roundTo * roundTo
    return dt + datetime.timedelta(0,rounding-seconds,-dt.microsecond)
 
-def plotMoisture(df, save_path):
+def plotMoisture(df, P, save_path):
     fig, ax = plt.subplots(figsize=(6, 4),
                         layout="constrained")
-
+    
+    
+    #Soil Moisture
     ax.plot(df.DateTime, df.SoilMoist_15cm, '-r',
      label = '15cm')
     ax.plot(df.DateTime, df.SoilMoist_30cm, '-b',
      label = '30cm')
     ax.plot(df.DateTime, df.SoilMoist_45cm, '-g',
      label = '45cm')
+    
+    ax.set_ylabel("Soil Moisture")
+
+    #Precip
+    ax2 = ax.twinx()
+    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
+    ax2.bar(Psnip.Date, Psnip.P_in, color = 'lightgrey', zorder = -2)
+
+    ax2.set_ylabel("Precipitation [in]")
 
     plt.xlabel("Date")
-    plt.ylabel("Soil Moisture")
     plt.title(str(df.SensorName[0]))
 
     plt.xlim(min(df.DateTime), max(df.DateTime))
 
-    plt.legend()
+    ax.set_zorder(ax2.get_zorder()+1)
+    ax.patch.set_visible(False)
+
+    ax.legend()
 
     #plt.show()
     plt.savefig(save_path + "moistfig" + str(df.SensorName[0]) + ".pdf")
     plt.savefig(save_path + "moistfig" + str(df.SensorName[0]) + ".jpg")
 
+    plt.show()
 
-
-def plotTemp(df, save_path):
+def plotTemp(df, P, save_path):
     fig, ax = plt.subplots(figsize=(6, 4),
                     layout="constrained")
+    
+    #Precip
+    ax2 = ax.twinx()
+    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
+    ax2.bar(Psnip.Date, Psnip.P_in, color = 'lightgrey')
 
+    ax2.set_ylabel("Precipitation [in]")
+
+    #Soil Temperature
     ax.plot(df.DateTime, df.SoilTemp1,
      label = '5cm')
     ax.plot(df.DateTime, df.SoilTemp2,
@@ -80,20 +119,35 @@ def plotTemp(df, save_path):
      label = '45cm')
     ax.plot(df.DateTime, df.SoilTemp6, 
      label = '55cm')
+    
+    ax.set_ylabel("Soil Temperature")
 
     plt.xlabel("Date")
-    plt.ylabel("Soil Temperature")
     plt.title(str(df.SensorName[0]))
 
     plt.xlim(min(df.DateTime), max(df.DateTime))
 
-    plt.legend()
+    ax.set_zorder(ax2.get_zorder()+1)
+    ax.patch.set_visible(False)
+
+    ax.legend()
 
     #plt.show()
     plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".pdf")
     plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".jpg")
 
+    plt.show()
 
+def snipPrecip(P, fir, la):
+    #function trims the precip log to the specified dates, filling in NaNs where there is no available data
+    #P must be a timeseries containing at least two columns, one with dates and one with precip values
+    range = pd.date_range(start = fir.date(), end = la.date())
+    return P.set_index('Date').reindex(range).rename_axis('Date').reset_index()
+   
+
+
+#%%
+'''Plots'''
 
 file_list = []
 for file in all_files:
@@ -113,16 +167,17 @@ for file in all_files:
         df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
     
     #Plot soil moisture
-    plotMoisture(df, save_path)
+    plotMoisture(df, precip, save_path)
 
     #Plot soil temperature
-    plotTemp(df, save_path)
+    plotTemp(df, precip, save_path)
     
     file_list.append(df)
     
 #Concatenate all files in list
 sensor_data = pd.concat(file_list, axis = 0, ignore_index = True)
 
+#%%
 
 '''EXPORT CSV FILE'''
 sensor_data.to_csv(save_path + '01_cleanedsensordata.csv')
@@ -136,3 +191,5 @@ sensor_data.to_csv(save_path + '01_cleanedsensordata.csv')
 
 
 
+
+# %%
