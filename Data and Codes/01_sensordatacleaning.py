@@ -297,7 +297,7 @@ for file in all_files:
     #plotTemp(df, precip, save_path)
 
     #plot soil temp heatmap
-    plotTemp_Heatmap(df, save_path)
+    #plotTemp_Heatmap(df, save_path)
 
     #plot soil moist heatmap
     #plotMoisture_Heatmap(df, save_path)
