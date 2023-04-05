@@ -19,33 +19,74 @@ import scipy
 import xarray as xr
 
 #%%
+'''IMPORT DATA'''
+import_path = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/"
+import_path_raw = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
 
-'''Import Data'''
-import_path = "E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/"
-save_path = "E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/"
-
-#Import Snow Data
+### Import Snow Data
 s2data = xr.open_dataset(import_path + '01_cleanedsnowdataS2.nc')
 s2data_df = s2data.to_dataframe().reset_index(drop = False)
 s2data_df = s2data_df.replace('NaN', np.nan)
 s2data_df = s2data_df.replace('nan', np.nan)
+s2data_df.time = pd.to_datetime(s2data_df.time)
 s2data_df['watershed'] = 'S2'
 
 s6data = xr.open_dataset(import_path + '01_cleanedsnowdataS6.nc')
 s6data_df = s6data.to_dataframe().reset_index(drop = False)
 s6data_df = s6data_df.replace('NaN', np.nan)
 s6data_df = s6data_df.replace('nan', np.nan)
+s6data_df.time = pd.to_datetime(s6data_df.time)
 s6data_df['watershed'] = 'S6'
 
-data_all = pd.concat([s2data_df, s6data_df], ignore_index = True)
 
+### Import Frost Data
+all_frost = pd.read_csv(import_path_raw + 'Snow/mef_snowfrost_data.csv',
+    parse_dates = ['DATE'], 
+    na_values = ['NaN'])
 
-#Import LAI Data
-'''DATA IMPORT'''
-filepath = "E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
-save_path_lai = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/'
-s2LAI_import = pd.read_csv(filepath + "S2_winterLAI.txt", sep = ';')
-s6LAI_import = pd.read_csv(filepath + "S6_summerLAI.txt", sep = ';')
+#Format Data
+all_frost = all_frost[1:]
+frost = all_frost.dropna(subset = ['FROST'])
+frost = frost.replace('2023-02-01', '2023-01-30')
+frost = frost[['STAKE NO', 'DATE', 'FROST.1']]
+frost['STAKE NO'] =[col.strip() for col in frost['STAKE NO']]
+frost['FROST.1'] =[np.float64(c) for c in frost['FROST.1']]
+frost['Zones'] = np.arange(0, len(frost.DATE))
+frost['Watershed'] = np.arange(0, len(frost.DATE))
+
+#Sort Stake Names
+for idx,row in frost.iterrows():
+    stake = row[0]
+
+    if stake.startswith('S6'):
+        frost.Watershed[idx] = 'S6'
+    else:
+        frost.Watershed[idx] = 'S2'
+        
+    if stake in ['S603', 'S632', 'S04', 'S05', 'S15', 'S44', 'S54']:
+        frost.Zones[idx] = 'Upland'
+    elif stake in ['S613', 'S622', 'S25']:
+        frost.Zones[idx] = 'Lagg'
+    else:
+        frost.Zones[idx] = 'Bog'
+
+### Import Soil Moisture and Temperature Data
+soilData = pd.read_csv(import_path + '01_cleanedsensordata.csv', 
+                       parse_dates= ['DateTime'], 
+                       na_values = ['NaN'])
+
+#Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
+precip_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
+precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv', 
+                     na_values = ['T', 'M'], 
+                     parse_dates = ['Date'], 
+                     names = ['Date', 'Tmax_F', 'Tmin_F', 'P_in', 'Snow_in', 'SnowDepth_in'], 
+                     header = 0, 
+                     dtype = {'P_in':float, 'Snow_in':float, 'SnowDepth_in':float})
+
+### Import LAI Data
+s2LAI_import = pd.read_csv(import_path_raw + "S2_winterLAI.txt", sep = ';')
+s6LAI_import = pd.read_csv(import_path_raw + "S6_summerLAI.txt", sep = ';')
 
 #Trim colnames
 s2LAI_import.columns =[col.strip() for col in s2LAI_import.columns]
@@ -78,331 +119,8 @@ s6LAI_grouped = s6LAI_groupednames.merge(s6LAI_groupednums, how = 'outer')
 #Trim zone names
 s2LAI_grouped.Zone =[col.strip() for col in s2LAI_grouped.Zone]
 s6LAI_grouped.Zone =[col.strip() for col in s6LAI_grouped.Zone]
-# %%
-'''Plots'''
-
-#%%
-
-custom_pal = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
-###Plot winter snow timeseries
-###S2
-fig = plt.figure(constrained_layout = True, 
-    figsize = (9,3))
-
-gs = GridSpec(1, 3, figure = fig)
-
-#histogram
-ax1 = fig.add_subplot(gs[0, 0])
-sns.kdeplot(data = s2data_df, 
-    x = 'depths', 
-    hue = 'zones', 
-    palette = custom_pal, 
-    #multiple = 'fill' 
-    fill = True
-    )
-
-ax1.set_xlabel('Snow depth [cm]')
-#ax1.set_ylim(0, 1)
-sns.move_legend(ax1, "upper left")
-
-#time series
-ax2 = fig.add_subplot(gs[0, 1:3])
-sns.lineplot(data = s2data_df, 
-    x = 'time',
-    y = 'depths',
-    hue = 'zones', 
-    #errorbar = 'ci', 
-    palette = custom_pal, 
-    ax = ax2, 
-    legend = False
-    )
-
-ax2.set_xlim('12-02-2022', '02-24-2023')
-ax2.set_ylim(0, 70)
-ax2.set_xlabel('Time')
-ax2.set_ylabel('Snow depth [cm]')
-
-plt.xticks(rotation=30)
-plt.suptitle('Snow Depths in S2')
-plt.savefig(save_path + 's2_kde_timeseries.pdf')
-plt.show()
-
-###S6
-fig = plt.figure(constrained_layout = True, 
-    figsize = (9,3))
-
-gs = GridSpec(1, 3, figure = fig)
-
-#histogram
-ax1 = fig.add_subplot(gs[0, 0])
-sns.kdeplot(data = s6data_df, 
-    x = 'depths', 
-    hue = 'zones', 
-    palette = custom_pal, 
-    #multiple = 'fill', 
-    fill = True
-    )
-
-ax1.set_xlabel('Snow depth [cm]')
-#ax1.set_ylim(0, 1)
-sns.move_legend(ax1, "upper left")
-
-#time series
-ax2 = fig.add_subplot(gs[0, 1:3])
-sns.lineplot(data = s6data_df, 
-    x = 'time',
-    y = 'depths',
-    hue = 'zones', 
- #   errorbar = 'ci', 
-    palette = custom_pal, 
-    ax = ax2, 
-    legend = False
-    )
-
-ax2.set_xlim('12-02-2022', '02-24-2023')
-ax2.set_ylim(0, 70)
-ax2.set_xlabel('Time')
-ax2.set_ylabel('Snow depth [cm]')
-
-plt.xticks(rotation=30)
-plt.suptitle('Snow Depths in S6')
-plt.savefig(save_path + 's6_kde_timeseries.pdf')
-plt.show()
-
 
 # %%
-# Plot summer LAI 
 
-def calc_corr(x, y, return_slope = False):
-    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x, y)
-    
-    if(return_slope):
-        return slope, r_value**2
-    else:
-        return r_value**2
-
-#Remove rows with NANs in the Zone column
-s2data_df = s2data_df.dropna(subset = ['zones'])
-s6data_df = s6data_df.dropna(subset = ['zones'])
-
-#Declare dataframe
-lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
-
-#Loop through the available times
-for t in set(s2data_df.time):
-    #Loop through regions
-    for z in ['Upland', 'Bog', 'Lagg']:
-        #Subset the snow data to match that time
-        snow_subset = s2data_df[(s2data_df.time == t) & (s2data_df.zones == z)]
-        #Sort so stakes match
-        snow_subset.sort_values('stakes')
-
-        #Remove two cases for now -- add back in when Kristina sends LAI data
-        if z == 'Upland':
-            snow_subset = snow_subset[snow_subset["stakes"].str.contains("S214") == False]
-  
-
-        #Subset
-        lai_subset = s2LAI_grouped[s2LAI_grouped.Zone == z]
-        #Sort so stakes match
-        lai_subset.sort_values('Stake_ID')
-  
-        #Calculate the correlation between the snowdepths and the LAI
-        slope, r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'], return_slope = True)
-
-        #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S2']})])
-
-        #Loop through the available times
-
-'''
-#S6       
-for t in set(s6data_df.time):
-    #Loop through regions
-    for z in ['Upland', 'Bog', 'Lagg']:
-        #Subset the snow data to match that time
-        snow_subset = s6data_df[(s6data_df.time == t) & (s6data_df.zones == z)]
-        #Sort so stakes match
-        snow_subset.sort_values('stakes')
-
-        #Remove two cases for now -- add back in when Kristina sends LAI data
-        if z == 'Upland':
-            snow_subset = snow_subset[snow_subset["stakes"].str.contains("S601|S602") == False]
-  
-
-        #Subset
-        lai_subset = s6LAI_grouped[s6LAI_grouped.Zone == z]
-        #Sort so stakes match
-        lai_subset.sort_values('Stake_ID')
-  
-        #Calculate the correlation between the snowdepths and the LAI
-        r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'])
-  
-        #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'watershed': ['S6']})])
-
-'''
-#Plot
-sns.set_style('white')
-fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(5.5, 7),
-                        layout="constrained")
-
-#R^2 values
-for t in set(lai_corr.time):
-    ax1.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
-
-sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['corr'],
-   hue = lai_corr['zone'], 
-   style = lai_corr['watershed'],
-   palette = custom_pal, 
-   s = 80,
-   linewidth = 0,
-   ax = ax1)
-
-plt.xticks(rotation=30)
-#plt.legend(loc = 'upper right')
-
-ax1.set_ylim(0, 1)
-ax1.set_xlabel(' ')
-ax1.set_ylabel(r'4Ring LAI and Snow Depth $R^2$')
-ax1.yaxis.set_label_position("right")
-ax1.yaxis.tick_right()
-
-#Slope values
-for t in set(lai_corr.time):
-    ax2.vlines(pd.to_datetime(t), ymin = -0.5, ymax = 0.5, colors = 'silver', zorder = 1)
-
-sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['slope'],
-   hue = lai_corr['zone'], 
-   style = lai_corr['watershed'],
-   palette = custom_pal, 
-   s = 80,
-   linewidth = 0,
-   ax = ax2)
-
-plt.xticks(rotation=30)
-#plt.legend(loc = 'upper right')
-
-ax2.set_ylim(-0.1, 0.1)
-ax2.set_xlabel(' ')
-ax2.set_ylabel(r'4Ring LAI and Snow Depth $\beta$')
-ax2.yaxis.set_label_position("right")
-ax2.yaxis.tick_right()
-
-plt.savefig(save_path_lai + 'lai_SD_correlations.pdf')
-plt.show()
-
-#%%
-#Plot sample individual corrplots
-fig, [ax1, ax2, ax3] = plt.subplots(ncols=1, nrows=3, figsize=(3, 9),
-                        layout="constrained"
-                        )
-
-#select data for time
-snow_time_subset = s2data_df[s2data_df.time == '02-24-2023']
-
-#quick patch
-snow_time_subset.depths[11] = 13
-
-#TIME = 2022-12-01, Bog
-ax1_R = calc_corr(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring'],
-                  snow_time_subset[snow_time_subset.zones == 'Bog']['depths'])
-sns.regplot(x = s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring'],
-                 y = snow_time_subset[snow_time_subset.zones == 'Bog']['depths'], 
-                 ax = ax1, 
-                 color = custom_pal[1])
-ax1.set_xlim(min(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring']), 
-             max(s2LAI_grouped[s2LAI_grouped.Zone == 'Bog']['LAI 4Ring']))
-#ax1.set_ylim(0, 25)
-ax1.set_ylabel('Snow depth [cm]')
-#ax1.text(1.9, 22, r'$R^2$ = %.2f' % ax1_R)
-
-#TIME = 2022-12-01, Upland
-x = s2LAI_grouped[(s2LAI_grouped.Zone == 'Upland')]['LAI 4Ring']
-y = snow_time_subset[(snow_time_subset.zones == 'Upland') & (snow_time_subset['stakes'].str.contains('S214') == False)]['depths']
-
-ax2_R = calc_corr(x,y)
-sns.regplot(x = x,
-                 y = y, 
-                 ax = ax2, 
-                 color = custom_pal[0])
-ax2.set_xlim(min(x), 
-             max(x))
-#ax2.set_ylim(0, 25)
-ax2.set_ylabel('Snow depth [cm]')
-#ax2.text(1.5, 22, r'$R^2$ = %.2f' % ax2_R)
-
-#TIME = 2022-12-01, Lagg
-ax3_R = calc_corr(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring'],
-                  snow_time_subset[snow_time_subset.zones == 'Lagg']['depths'])
-sns.regplot(x = s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring'],
-                 y = snow_time_subset[snow_time_subset.zones == 'Lagg']['depths'], 
-                 ax = ax3, 
-                 color = custom_pal[2])
-ax3.set_xlim(min(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring']), 
-             max(s2LAI_grouped[s2LAI_grouped.Zone == 'Lagg']['LAI 4Ring']))
-#ax3.set_ylim(0, 25)
-ax3.set_ylabel('Snow depth [cm]')
-#ax3.text(1.5, 22, r'$R^2$ = %.2f' % ax3_R)
-
-plt.savefig(save_path_lai + 'sampCorrPlots.pdf')
-plt.show()
-
-# %%
-'''Load in frost data'''
-
-all_frost = pd.read_csv(filepath + 'Snow/mef_snowfrost_data.csv',
-    parse_dates = ['DATE'], 
-    na_values = ['NaN'])
-
-#Remove row
-all_frost = all_frost[1:]
-
-#Subset to just frost data
-frost = all_frost.dropna(subset = ['FROST'])
-
-#Correct measurement dates
-frost = frost.replace('2023-02-01', '2023-01-30')
-
-#Subset correct columns
-frost = frost[['STAKE NO', 'DATE', 'FROST.1']]
-
-#Trim stake names
-frost['STAKE NO'] =[col.strip() for col in frost['STAKE NO']]
-
-#Cast as floats
-frost['FROST.1'] =[np.float64(c) for c in frost['FROST.1']]
-
-#Add column and assign zones
-frost['Zones'] = np.arange(0, len(frost.DATE))
-
-for idx,row in frost.iterrows():
-    stake = row[0]
-
-    if stake in ['S603', 'S632', 'S04', 'S05', 'S15', 'S44', 'S54']:
-        frost.Zones[idx] = 'Upland'
-    elif stake in ['S613', 'S622', 'S25']:
-        frost.Zones[idx] = 'Lagg'
-    else:
-        frost.Zones[idx] = 'Bog'
-
-
-# %%
-#Plot Frost depths
-fig, axs = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
-                        layout="constrained")
-
-sns.boxplot(x = frost['DATE'].dt.date, y = frost['FROST.1'],
-    hue = frost['Zones'], 
-    palette = custom_pal, 
-    boxprops={"edgecolor": "white",
-                "linewidth": 0.5},
-    ax = axs)
-
-axs.set_xlabel(' ')
-axs.set_ylabel('Frost Depth [cm]')
-
-plt.savefig(save_path + 'frost_depths_timeseries.pdf')
-plt.show()
 
 # %%
