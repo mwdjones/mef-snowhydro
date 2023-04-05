@@ -27,12 +27,13 @@ import datetime
 
 '''PROBE DATA IMPORT'''
 #Soil Data from Gropoint sensors
-directory = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/GroPoint/'
-save_path = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/soilPlots/'
+directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/GroPoint/'
+save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/soilPlots/'
+import_path_frost = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
 all_files = glob.glob(os.path.join(directory, 'S*.txt'))
 
 #Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
-precip_directory = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
+precip_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
 precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv', 
                      na_values = ['T', 'M'], 
                      parse_dates = ['Date'], 
@@ -40,6 +41,36 @@ precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv',
                      header = 0, 
                      dtype = {'P_in':float, 'Snow_in':float, 'SnowDepth_in':float})
 
+#Frost Data from Anne
+all_frost = pd.read_csv(import_path_frost + 'Snow/mef_snowfrost_data.csv',
+    parse_dates = ['DATE'], 
+    na_values = ['NaN'])
+
+#Format Data
+all_frost = all_frost[1:]
+frost = all_frost.dropna(subset = ['FROST'])
+frost = frost.replace('2023-02-01', '2023-01-30')
+frost = frost[['STAKE NO', 'DATE', 'FROST.1']]
+frost['STAKE NO'] =[col.strip() for col in frost['STAKE NO']]
+frost['FROST.1'] =[np.float64(c) for c in frost['FROST.1']]
+frost['Zones'] = np.arange(0, len(frost.DATE))
+frost['Watershed'] = np.arange(0, len(frost.DATE))
+
+#Sort Stake Names
+for idx,row in frost.iterrows():
+    stake = row[0]
+
+    if stake.startswith('S6'):
+        frost.Watershed[idx] = 'S6'
+    else:
+        frost.Watershed[idx] = 'S2'
+        
+    if stake in ['S603', 'S632', 'S04', 'S05', 'S15', 'S44', 'S54']:
+        frost.Zones[idx] = 'Upland'
+    elif stake in ['S613', 'S622', 'S25']:
+        frost.Zones[idx] = 'Lagg'
+    else:
+        frost.Zones[idx] = 'Bog'
 #For timestamp rounding 
 dt_format = "%Y-%m-%d %H:%M"
 
@@ -138,6 +169,99 @@ def plotTemp(df, P, save_path):
 
     plt.show()
 
+def plotTemp_Heatmap(df, save_path):
+    #Aggregate to daily - makes contour smoother
+    df['DateTime'] = df['DateTime'].astype('datetime64[ns]')
+    df2 = df.resample('D', on = 'DateTime').mean().reset_index()
+
+    #select soil temp data
+    data = df2.filter(regex = r'SoilTemp')
+
+    #dates 
+    dates = df2.DateTime
+
+    #depths 
+    depths = np.array([5, 15, 25, 35, 45, 55]) #depths in centimeters
+
+    #levels
+    levels = np.arange(-2, 14, 2)
+
+    #plot heatmap
+    fig, ax = plt.subplots(figsize = (8, 4),
+                           layout = 'constrained')
+    
+    cset1 = ax.contourf(dates, depths, data.T, 
+                    levels = levels,
+                    cmap = 'coolwarm')
+    cset2 = ax.contour(dates, depths, data.T, 
+                    levels = cset1.levels,
+                    colors = 'black')
+    
+    #frost contour line
+    cset3 = ax.contour(dates, depths, data.T, 
+                       levels = (0,), 
+                       colors = 'red', 
+                       linewidth = 2)
+    
+    #Add manual data
+    #Match sensor name
+    frostTemp = all_frost[(all_frost['STAKE NO'].str.contains(df.SensorName[0][-2:])) & (all_frost['FROST.1'] >= 5)]
+ 
+    #Plots
+    ax.scatter(frostTemp['DATE'], frostTemp['FROST.1'], 
+            marker = 'X', 
+            edgecolors = 'black', 
+            facecolor = 'white')
+    
+    ax.invert_yaxis()
+    fig.colorbar(cset1, ax = ax, label = 'Soil Temperature [degC]')
+    plt.title(str(df.SensorName[0]))
+
+
+    plt.savefig(save_path + "tempfig_heatmap" + str(df.SensorName[0]) + ".pdf")
+    plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".jpg")
+
+    plt.show()
+
+def plotMoisture_Heatmap(df, save_path):
+    #Aggregate to daily - makes contour smoother
+    df['DateTime'] = df['DateTime'].astype('datetime64[ns]')
+    df2 = df.resample('D', on = 'DateTime').mean().reset_index()
+
+    #select soil temp data
+    data = df2.filter(regex = r'SoilMoist')
+
+    #dates 
+    dates = df2.DateTime
+
+    #depths 
+    depths = np.array([15, 30, 45]) #depths in centimeters
+
+    #levels
+    levels = np.arange(0, 40, 5)
+
+    #plot heatmap
+    fig, ax = plt.subplots(figsize = (8, 4),
+                           layout = 'constrained')
+    
+    cset1 = ax.contourf(dates, depths, data.T, 
+                    levels = levels,
+                    cmap = 'viridis_r')
+    cset2 = ax.contour(dates, depths, data.T, 
+                    levels = cset1.levels,
+                    colors = 'black')
+    
+    ax.invert_yaxis()
+    fig.colorbar(cset1, ax = ax, label = 'Soil Moisture [cm3/cm3]')
+    plt.title(str(df.SensorName[0]))
+
+
+    plt.savefig(save_path + "moistfig_heatmap" + str(df.SensorName[0]) + ".pdf")
+    plt.savefig(save_path + "moistfig" + str(df.SensorName[0]) + ".jpg")
+
+    plt.show()
+
+
 def snipPrecip(P, fir, la):
     #function trims the precip log to the specified dates, filling in NaNs where there is no available data
     #P must be a timeseries containing at least two columns, one with dates and one with precip values
@@ -167,10 +291,16 @@ for file in all_files:
         df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
     
     #Plot soil moisture
-    plotMoisture(df, precip, save_path)
+    #plotMoisture(df, precip, save_path)
 
     #Plot soil temperature
-    plotTemp(df, precip, save_path)
+    #plotTemp(df, precip, save_path)
+
+    #plot soil temp heatmap
+    plotTemp_Heatmap(df, save_path)
+
+    #plot soil moist heatmap
+    #plotMoisture_Heatmap(df, save_path)
     
     file_list.append(df)
     
