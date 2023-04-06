@@ -4,6 +4,8 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 
+#%%
+
 '''Data'''
 #Add data for each sampling date
 data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
@@ -139,6 +141,21 @@ zones_s6 = [[np.nan, 'Upland', 'Upland', np.nan, np.nan, np.nan],
             [np.nan, np.nan, 'Upland', 'Lagg', 'Bog', 'Lagg'],
             [np.nan, np.nan, np.nan, 'Upland', 'Upland', 'Upland']]
 
+aspect_s6 = [[np.nan, 259.7763, 350.3666, np.nan, np.nan, np.nan],
+            [166.1192, 154.9844, 226.2777, 203.7467, 188.4725, np.nan],
+            [284.0857, 23.90763, 81.84194, 214.6792, 250.6175, 264.7998],
+            [np.nan, 149.6178, 51.39898, 348.6811, 215.5392, 210.6501],
+            [np.nan, np.nan, 84.29677, 37.4997, 161.5534, 84.30152],
+            [np.nan, np.nan, np.nan, 100.015, 13.71132, 356.9422]]
+
+slope_s6 = [[np.nan, 6.629145, 1.924451, np.nan, np.nan, np.nan],
+            [3.132299, 0.592828, 13.37794, 2.9316, 1.701028, np.nan],
+            [9.7621, 21.69698, 0.253367, 16.22974, 4.093031, 1.186282],
+            [np.nan, 1.203789, 25.4478, 0.547875, 4.916601, 6.712477],
+            [np.nan, np.nan, 1.439196, 19.39961, 0.339843, 0.71976],
+            [np.nan, np.nan, np.nan, 0.618323, 10.60362, 4.687178]]
+
+
 Northing_s2 = np.array(np.linspace(464819, 464448, 6)) 
 Easting_s2 = np.array(np.linspace(5262240, 5262552, 7))
 
@@ -155,6 +172,20 @@ zones_s2 = [['Upland', 'Upland', 'Upland', 'Upland', 'Upland', 'Upland', np.nan]
             [np.nan, np.nan, 'Lagg', 'Bog', 'Bog', 'Lagg', 'Upland'],
             [np.nan, np.nan, np.nan, 'Upland', 'Upland', 'Upland', 'Upland'],
             [np.nan, np.nan, np.nan, np.nan, 'Upland', 'Upland', np.nan]]
+
+aspect_s2 = [[193.3626, 115.0966, 352.4059, 135.0012, 254.4066, 355.2919, np.nan],
+            [np.nan, 332.3497, 291.1621, 120.0787, 9.296235, 201.5048, np.nan],
+            [252.4753, 200.2377, 279.4718, 174.7998, 187.7631, 58.388, 275.0663],
+            [np.nan, np.nan, 25.94226, 113.9634, 180, 105.2713, 4.635716],
+            [np.nan, np.nan, np.nan, 50.67678, 355.6789, 21.695, 308.4806],
+            [np.nan, np.nan, np.nan, np.nan, 225, 0.008743, np.nan]]
+
+slope_s2 = [[6.632267, 3.120716, 2.16637, 7.45287, 9.503919, 3.051387, np.nan],
+            [np.nan, 0.84887, 2.37949, 0.78623, 3.98498, 1.26977, np.nan],
+            [2.85169, 0.72501, 0.43563, 0.39548, 3.17706, 1.09319, 2.38778],
+            [np.nan, np.nan, 14.422, 0.70519, 0.28632, 0.40827, 1.32895],
+            [np.nan, np.nan, np.nan, 8.63669, 8.02736, 3.57951, 5.336709],
+            [np.nan, np.nan, np.nan, np.nan, 0.96229, 1.43197, np.nan]]
 
 '''Build Dataset'''
 
