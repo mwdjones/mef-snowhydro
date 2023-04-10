@@ -39,6 +39,7 @@ s6data_df = s6data_df.replace('nan', np.nan)
 s6data_df.time = pd.to_datetime(s6data_df.time)
 s6data_df['watershed'] = 'S6'
 
+allSnow_df = pd.concat([s6data_df, s2data_df])
 
 ### Import Frost Data
 all_frost = pd.read_csv(import_path_raw + 'Snow/mef_snowfrost_data.csv',
@@ -87,7 +88,7 @@ precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv',
 
 ### Import LAI Data
 s2LAI_import = pd.read_csv(import_path_raw + "S2_winterLAI.txt", sep = ';')
-s6LAI_import = pd.read_csv(import_path_raw + "S6_summerLAI.txt", sep = ';')
+s6LAI_import = pd.read_csv(import_path_raw + "S6_winterLAI.txt", sep = ';')
 
 #Trim colnames
 s2LAI_import.columns =[col.strip() for col in s2LAI_import.columns]
@@ -250,6 +251,43 @@ plt.savefig(save_path + 'snowPlots/' + 's6_kde_timeseries.pdf')
 plt.show()
 
 #%%
+'''SNOW DEPTH BY SLOPE AND ASPECT'''
+
+#Plot the snow depths on polar coordinates with 0-360 aspect
+#Dictate point size as slope - smaller slopes (bog) won't be as visible
+fig, [ax1, ax2] = plt.subplots(1, 2, constrained_layout = True, 
+                subplot_kw = {'projection':'polar'},
+                figsize = (8,3))
+
+plot1 = ax1.scatter(x = s2data_df["aspect"], y = s2data_df["depths"],
+         c = s2data_df['slope'],
+         s = s2data_df['slope'],
+         vmin = 0, vmax = 25,
+         zorder = 4)
+
+plot2 = ax2.scatter(x = s6data_df["aspect"], y = s6data_df["depths"],
+         c = s6data_df['slope'],
+         s = s6data_df['slope'],
+         vmin = 0, vmax = 25,
+         zorder = 4)
+
+fig.colorbar(plot2, ax = ax2, label = "Slope (%)")
+
+ax1.set_title('S2')
+ax1.set_theta_direction(-1)
+ax1.set_theta_zero_location("N")
+ax1.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+
+ax2.set_title('S6')
+ax2.set_theta_direction(-1)
+ax2.set_theta_zero_location("N")
+ax2.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+
+plt.savefig(save_path + 'snowPlots/' + 'aspectPolarPlot.pdf')
+plt.show()
+
+
+#%%
 '''LAI AND SNOW DEPTHS'''
 # Plot summer LAI 
 #Remove rows with NANs in the Zone column
@@ -287,7 +325,6 @@ for t in set(s2data_df.time):
 
         #Loop through the available times
 
-'''
 #S6       
 for t in set(s6data_df.time):
     #Loop through regions
@@ -298,8 +335,8 @@ for t in set(s6data_df.time):
         snow_subset.sort_values('stakes')
 
         #Remove two cases for now -- add back in when Kristina sends LAI data
-        if z == 'Upland':
-            snow_subset = snow_subset[snow_subset["stakes"].str.contains("S601|S602") == False]
+        #if z == 'Upland':
+        #    snow_subset = snow_subset[snow_subset["stakes"].str.contains("S601|S602") == False]
   
 
         #Subset
@@ -308,12 +345,11 @@ for t in set(s6data_df.time):
         lai_subset.sort_values('Stake_ID')
   
         #Calculate the correlation between the snowdepths and the LAI
-        r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'])
-  
-        #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'watershed': ['S6']})])
+        slope, r = calc_corr(snow_subset['depths'], lai_subset['LAI 4Ring'], return_slope = True)
 
-'''
+        #Append to dataframe
+        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S6']})])
+
 
 #Plot
 sns.set_style('white')
@@ -356,7 +392,7 @@ sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['slope'],
 plt.xticks(rotation=30)
 #plt.legend(loc = 'upper right')
 
-ax2.set_ylim(-0.1, 0.1)
+ax2.set_ylim(-0.2, 0.2)
 ax2.set_xlabel(' ')
 ax2.set_ylabel(r'4Ring LAI and Snow Depth $\beta$')
 ax2.yaxis.set_label_position("right")

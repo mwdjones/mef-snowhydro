@@ -192,7 +192,10 @@ slope_s2 = [[6.632267, 3.120716, 2.16637, 7.45287, 9.503919, 3.051387, np.nan],
 snow_s6 = xr.Dataset(
     data_vars = {"stakes": (["northing", "easting"], stakes_s6),
                  "zones": (["northing", "easting"], zones_s6),
+                 "aspect": (["northing", "easting"], aspect_s6),
+                 "slope": (["northing", "easting"], slope_s6),
                  "depths": (["time", "northing", "easting"], data_s6),
+                 
     },
     coords={
         "time": times,
@@ -204,6 +207,8 @@ snow_s6 = xr.Dataset(
 snow_s2 = xr.Dataset(
     data_vars = {"stakes": (["northing", "easting"], stakes_s2),
                  "zones": (["northing", "easting"], zones_s2),
+                 "aspect": (["northing", "easting"], aspect_s2),
+                 "slope": (["northing", "easting"], slope_s2),
                  "depths": (["time", "northing", "easting"], data_s2),
     },
     coords={
@@ -216,7 +221,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
+save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
@@ -244,7 +249,7 @@ plt.show()
 #%%
 '''SAVE DATA'''
 
-data_savepath = 'E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
+data_savepath = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
 
 snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')
 snow_s6.to_netcdf(data_savepath + '01_cleanedsnowdataS6.nc')

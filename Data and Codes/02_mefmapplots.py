@@ -34,10 +34,10 @@ import rasterio
 '''Import Marcell Shapefiles'''
 
 #Import watershed shapefiles
-mef = gpd.read_file("E:/1_DesktopBackup/Feng Research/Data/MEF GIS Data/watersheds/S2S6.shp")
+mef = gpd.read_file("D:/1_DesktopBackup/Feng Research/Data/MEF GIS Data/watersheds/S2S6.shp")
 
 #Import veg stakes dataframe - covert to geopandas
-veg_stakes_data = pd.read_csv("E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Data Collection/0 _ Experimental Setup/Vegetations Sampling Grid/GridCoordinates.csv")
+veg_stakes_data = pd.read_csv("D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Data Collection/0 _ Experimental Setup/Vegetations Sampling Grid/GridCoordinates.csv")
 veg_stakes = gpd.GeoDataFrame(
     veg_stakes_data, 
     geometry = gpd.points_from_xy(veg_stakes_data.NORTHING, veg_stakes_data.EASTING), 
@@ -47,7 +47,7 @@ veg_stakes = gpd.GeoDataFrame(
 mef_proj = mef.to_crs('EPSG:32633')
 
 #Import DEM
-dem = rasterio.open("E:/1_DesktopBackup/Feng Research/Data/MEF Lidar/dem_mef.tif")
+dem = rasterio.open("D:/1_DesktopBackup/Feng Research/Data/MEF Lidar/dem_mef.tif")
 
 #%%
 '''Subset to S2'''
@@ -85,6 +85,35 @@ ax.set_ylabel('Easting')
 ax.set_xlim(464300.0, 464900.0)
 ax.set_xlabel('Northing')
 
-plt.savefig('E:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/mapPlot.pdf')
+plt.savefig('D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/mapPlotS2.pdf')
+
 
 #%%
+'''Subset to S6'''
+
+#Clip spatial data to S6
+veg_stakes_s6 = veg_stakes.cx[:, 5262900:5263400]
+#%%
+'''Plot'''
+
+fig, ax = plt.subplots()
+
+#extent=[veg_stakes_s2.total_bounds[0], veg_stakes_s2.total_bounds[2], veg_stakes_s2.total_bounds[1], veg_stakes_s2.total_bounds[3]]
+ax = rasterio.plot.show(dem, alpha = 0.3,
+                        ax=ax, cmap = 'Greens')
+ax = rasterio.plot.show(dem, 
+                        contour = True,
+                        ax=ax, cmap = 'Greens')
+
+veg_stakes_s6.plot(column = 'ZONE', k=3, categorical=True,
+                   cmap = custom_cmap, ax=ax, 
+                   zorder = 7, 
+                   s = 80)
+
+ax.set_ylim(5262850.0, 5263400.0)
+ax.set_ylabel('Easting')
+ax.set_xlim(464200.0, 464800.0)
+ax.set_xlabel('Northing')
+
+plt.savefig('D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/laiPlots/mapPlotS6.pdf')
+# %%

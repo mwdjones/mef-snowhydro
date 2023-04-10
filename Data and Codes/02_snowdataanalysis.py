@@ -17,6 +17,7 @@ import numpy as np
 import seaborn as sns
 import scipy
 import xarray as xr
+import statsmodels
 
 #%%
 '''IMPORT DATA'''
@@ -122,5 +123,25 @@ s6LAI_grouped.Zone =[col.strip() for col in s6LAI_grouped.Zone]
 
 # %%
 
+'''TIMESERIES BASICS'''
+s2_grouped = s2data_df.groupby(by = ['zones', 'time']).mean().reset_index()
+s6_grouped = s6data_df.groupby(by = ['zones', 'time']).mean().reset_index()
+
+s2Bog = s2_grouped[s2_grouped.zones == 'Bog']
+s2Lagg = s2_grouped[s2_grouped.zones == 'Lagg']
+s2Upland = s2_grouped[s2_grouped.zones == 'Upland']
+
+s6Bog = s6_grouped[s6_grouped.zones == 'Bog']
+s6Lagg = s6_grouped[s6_grouped.zones == 'Lagg']
+s6Upland = s6_grouped[s6_grouped.zones == 'Upland']
+
+#Is the variance, mean and autocovariance of the snow depth relatively stable over time?
+from statsmodels.graphics.tsaplots import plot_acf
+
+plot_acf(np.array(s6Bog.depths.squeeze()))
+plot_acf(np.array(s6Lagg.depths.squeeze()))
+plot_acf(np.array(s6Upland.depths.squeeze()))
+
+#
 
 # %%
