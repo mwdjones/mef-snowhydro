@@ -23,6 +23,8 @@ from matplotlib.colors import LinearSegmentedColormap
 
 ### geopandas, for dealing with shapefiles as Pandas dataframes
 import geopandas as gpd
+from pyproj import Proj, transform
+
 ### contextily, for base maps
 import contextily as cx
 ### rasterio for DEM
@@ -34,7 +36,8 @@ import rasterio
 '''Import Marcell Shapefiles'''
 
 #Import watershed shapefiles
-mef = gpd.read_file("D:/1_DesktopBackup/Feng Research/Data/MEF GIS Data/watersheds/S2S6.shp")
+mef = gpd.read_file("D:/1_DesktopBackup/Feng Research/Data/MEF GIS Data/watersheds/S2S6.shp", 
+                    crs="EPSG:4269")
 
 #Import veg stakes dataframe - covert to geopandas
 veg_stakes_data = pd.read_csv("D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/Data Collection/0 _ Experimental Setup/Vegetations Sampling Grid/GridCoordinates.csv")
@@ -44,7 +47,10 @@ veg_stakes = gpd.GeoDataFrame(
     crs="EPSG:32633")
 
 #Change MEF shapefiles projection
-mef_proj = mef.to_crs('EPSG:32633')
+mef_proj = mef.to_crs({'init':'EPSG:2027'})
+#Translate mef shapefile
+mef_proj = mef_proj.translate(xoff = -25, yoff = 220)
+mef_proj = mef_proj.scale(xfact = 1.2, yfact = 1.2)
 
 #Import DEM
 dem = rasterio.open("D:/1_DesktopBackup/Feng Research/Data/MEF Lidar/dem_mef.tif")
@@ -67,6 +73,9 @@ ax = rasterio.plot.show(dem, alpha = 0.3,
 ax = rasterio.plot.show(dem, 
                         contour = True,
                         ax=ax, cmap = 'Greens')
+
+ax = mef_proj.plot(color = 'none', edgecolor = 'black', 
+                   ax = ax, zorder = 8)
 
 veg_stakes_s2.plot(column = 'ZONE', k=3, categorical=True,
                    cmap = custom_cmap, ax=ax, 
@@ -104,6 +113,9 @@ ax = rasterio.plot.show(dem, alpha = 0.3,
 ax = rasterio.plot.show(dem, 
                         contour = True,
                         ax=ax, cmap = 'Greens')
+
+ax = mef_proj.plot(color = 'none', edgecolor = 'black', 
+                   ax = ax, zorder = 8)
 
 veg_stakes_s6.plot(column = 'ZONE', k=3, categorical=True,
                    cmap = custom_cmap, ax=ax, 
