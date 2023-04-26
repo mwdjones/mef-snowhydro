@@ -61,10 +61,40 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [25, 44, 54, 30, 28, 26],
             [np.nan, 33, 40, 48, 18, 30],
             [np.nan, np.nan, 26, 40, 59, 25],
-            [np.nan, np.nan, np.nan, 23, 33, 25]]]
+            [np.nan, np.nan, np.nan, 23, 33, 25]], 
+            [[np.nan, 41, 43, np.nan, np.nan, np.nan],
+            [31, 29, 30, 30, 30, np.nan],
+            [26, 42, 55, 25, 26, 26],
+            [np.nan, 35, 26.5, 37, 21, 28],
+            [np.nan, np.nan, 23, 48, 50, 31],
+            [np.nan, np.nan, np.nan, 20, 35.5, 25.5]], 
+            [[np.nan, 47, 53, np.nan, np.nan, np.nan],
+            [42, 47, 45, 43, 53, np.nan],
+            [32, 49, 65, 34, 37, 34],
+            [np.nan, 31, 49, 45, 26, 41],
+            [np.nan, np.nan, 33, 56, 61, 33],
+            [np.nan, np.nan, np.nan, 29, 44, 34]], 
+            [[np.nan, 60, 57, np.nan, np.nan, np.nan],
+            [38, 39, 48, 51, 57, np.nan],
+            [34, 37, 71, 38, 40, 40],
+            [np.nan, 38, 52, 72, 29, 47],
+            [np.nan, np.nan, 25, 56, 66, 22],
+            [np.nan, np.nan, np.nan, 33, 53, 40]], 
+            [[np.nan, 47, 51, np.nan, np.nan, np.nan],
+            [34, 36, 32, 46, 52, np.nan],
+            [29, 44, 57, 33, 25, 37],
+            [np.nan, 47, 43, 56, 34, 40],
+            [np.nan, np.nan, 23, 53, 62, 29],
+            [np.nan, np.nan, np.nan, 30, 52, 35]], 
+            [[np.nan, 21, 9, np.nan, np.nan, np.nan],
+            [0, 14, 0, 9, 19, np.nan],
+            [0, 10, 0, 0, 0, 1], #Need to interpolate S634 (likely 0)
+            [np.nan, 0, 9, 35, 0, 0],
+            [np.nan, np.nan, 0, 6, 35, 0],
+            [np.nan, np.nan, np.nan, 0, 7, 0]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
-            [np.nan, 11, 5, 19, 13, 11, np.nan], #interpolated value (13)
+            [np.nan, 11, 5, 19, 13, 11, np.nan], # S214 interpolated (13)
             [14.5, 5, 14, 14.5, 5, 8, 8.5],
             [np.nan, np.nan, 9, 10, 9.5, 14, 11],
             [np.nan, np.nan, np.nan, 5.5, 8, 9, 4],
@@ -116,11 +146,45 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [52, 38, 49, 52, 46, 53, 44],
             [np.nan, np.nan, 52, 49, 61, 56, 46],
             [np.nan, np.nan, np.nan, 44, 49, 48, 50],
-            [np.nan, np.nan, np.nan, np.nan, 44, 46, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 44, 46, np.nan]], 
+            [[43, 48, 29.5, 29, 29, 39, np.nan],
+            [np.nan, 39, 30, 62.5, 45.5, 22, np.nan],
+            [53, 27, 46, 46, 45, 57, 41],
+            [np.nan, np.nan, 51.5, 47, 54, 60, 48],
+            [np.nan, np.nan, np.nan, 41.5, 47.5, 48.5, 48],
+            [np.nan, np.nan, np.nan, np.nan, 46, 38, np.nan]], 
+            [[53, 49, 33, 38, 36, 55, np.nan],
+            [np.nan, 60, 51, 41, 58, 76, np.nan],
+            [64, 49, 60, 59, 62, 61, 54],
+            [np.nan, np.nan, 55, 60, 66, 68, 57],
+            [np.nan, np.nan, np.nan, 60, 60, 52, 59],
+            [np.nan, np.nan, np.nan, np.nan, 60, 53, np.nan]], 
+            [[70, 59, 33, 38, 34, 62, np.nan],
+            [np.nan, 57, 58, 78, 60, 73, np.nan],
+            [68, 56, 63, 69, 60, 50, 59],
+            [np.nan, np.nan, 66, 68, 70, 75, 56.5], #S236 interpolated (56.5)
+            [np.nan, np.nan, np.nan, 66, 65, 55, 65],
+            [np.nan, np.nan, np.nan, np.nan, 59, 57, np.nan]], 
+            [[53, 45, 29, 49, 20, 57, np.nan],
+            [np.nan, 64, 50, 76, 53, 59, np.nan],
+            [44, 50, 57, 64, 64, 51, 53],
+            [np.nan, np.nan, 53, 44, 62, 66, 54],
+            [np.nan, np.nan, np.nan, 62, 60, 59, 57],
+            [np.nan, np.nan, np.nan, np.nan, 48, 54, np.nan]], 
+            [[0, 0, 0, 0, 0, 6, np.nan], #Need to interpolate S200 (likely 0)
+            [np.nan, 7, 10, 21, 2, 10, np.nan],
+            [0, 17, 26, 25, 35, 34, 0], #Need to interpolate S220 (likely 0)
+            [np.nan, np.nan, 22, 18, 29, 26, 13],
+            [np.nan, np.nan, np.nan, 15, 18, 9, 10],
+            [np.nan, np.nan, np.nan, np.nan, 6, 5, np.nan]]]
 
 '''Times'''
 #Add dates as needed
-times = np.array(['12-02-2022', '12-30-2022', '01-05-2023', '01-13-2023', '01-20-2023', '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023'])
+times = np.array(['12-02-2022', '12-30-2022',
+ '01-05-2023', '01-13-2023', '01-20-2023',
+ '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
+ '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
+ '04-14-2023'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
@@ -221,7 +285,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/snowPlots/'
+save_path = '../Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
@@ -249,7 +313,7 @@ plt.show()
 #%%
 '''SAVE DATA'''
 
-data_savepath = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/'
+data_savepath = './Cleaned Data/'
 
 snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')
 snow_s6.to_netcdf(data_savepath + '01_cleanedsnowdataS6.nc')

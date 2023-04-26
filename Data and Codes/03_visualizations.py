@@ -20,8 +20,8 @@ import xarray as xr
 
 #%%
 '''Import Data'''
-import_path = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/"
-import_path_raw = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
+import_path = "./Cleaned Data/"
+import_path_raw = "./Raw Data/"
 
 
 ### Import Snow Data
@@ -78,8 +78,7 @@ soilData = pd.read_csv(import_path + '01_cleanedsensordata.csv',
                        na_values = ['NaN'])
 
 #Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
-precip_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
-precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv', 
+precip = pd.read_csv(import_path_raw + 'GrandRapids_Precip_MNDNR.csv', 
                      na_values = ['T', 'M'], 
                      parse_dates = ['Date'], 
                      names = ['Date', 'Tmax_F', 'Tmin_F', 'P_in', 'Snow_in', 'SnowDepth_in'], 
@@ -125,7 +124,7 @@ def calc_corr(x, y, return_slope = False):
 #%%
 '''PLOTTING SPECIFICS'''
 #Save Paths
-save_path = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/"
+save_path = "../Figures/"
 
 #Plotting Specifics
 custom_pal = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
@@ -322,7 +321,7 @@ for t in set(s2data_df.time):
 
         #Loop through the available times
 
-'''
+
 #S6       
 for t in set(s6data_df.time):
     #Loop through regions
@@ -347,7 +346,7 @@ for t in set(s6data_df.time):
 
         #Append to dataframe
         lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S6']})])
-'''
+
 
 #Plot
 sns.set_style('white')
@@ -473,6 +472,7 @@ sns.boxplot(x = frost['DATE'].dt.date, y = frost['FROST.1'],
 
 axs.set_xlabel(' ')
 axs.set_ylabel('Frost Depth [cm]')
+plt.xticks(rotation=30)
 
 plt.savefig(save_path + 'frost_depths_timeseries.pdf')
 plt.show()
@@ -480,7 +480,7 @@ plt.show()
 #%%
 '''SNOW AND FROST TIME SERIES'''
 
-ylimit = 60
+ylimit = 90
 ylimit_frost = 25
 
 def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, labs = False):
