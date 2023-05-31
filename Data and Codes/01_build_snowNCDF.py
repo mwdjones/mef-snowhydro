@@ -91,7 +91,13 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [0, 10, 0, 0, 0, 1], #Need to interpolate S634 (likely 0)
             [np.nan, 0, 9, 35, 0, 0],
             [np.nan, np.nan, 0, 6, 35, 0],
-            [np.nan, np.nan, np.nan, 0, 7, 0]]]
+            [np.nan, np.nan, np.nan, 0, 7, 0]], 
+            [[np.nan, 8, 0, np.nan, np.nan, np.nan],
+            [0, 0, 0, 0, 7, np.nan],
+            [0, 0, 17, 0, 0, 0],
+            [np.nan, 0, 0, 28, 0, 0],
+            [np.nan, np.nan, 0, 3, 16, 0],
+            [np.nan, np.nan, np.nan, 0, 3, 0]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, 13, 11, np.nan], # S214 interpolated (13)
@@ -99,9 +105,9 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, np.nan, 9, 10, 9.5, 14, 11],
             [np.nan, np.nan, np.nan, 5.5, 8, 9, 4],
             [np.nan, np.nan, np.nan, np.nan, 12, 5, np.nan]], 
-            [[np.nan, 24, 24, 32, 23.5, 25, np.nan],
-            [np.nan, 26, 22.5, np.nan, 32, 44, np.nan],
-            [47, np.nan, 29, 34, 31, 34, 35],
+            [[19.25, 24, 24, 32, 23.5, 25, np.nan], #19.25 interpolated in time
+            [np.nan, 26, 22.5, 28, 32, 44, np.nan], #28 interpolated in time
+            [47, 16, 29, 34, 31, 34, 35], #16 interpolated in time
             [np.nan, np.nan, 26, 32, 46, 37, 29],
             [np.nan, np.nan, np.nan, 36.5, 27.5, 33, 35],
             [np.nan, np.nan, np.nan, np.nan, 24.5, 24, np.nan]], 
@@ -123,12 +129,12 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, np.nan, 37, 43, 36, 49.5, 42],
             [np.nan, np.nan, np.nan, 33.5, 40.5, 37.5, 36],
             [np.nan, np.nan, np.nan, np.nan, 38.5, 36, np.nan]], 
-            [[np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]], 
+            [[41.5, 39.5, 27.75, 30.5, 25, 35.75, np.nan], #Whole timestamp is linearly interpolated from the previous and subsequent stakes
+            [np.nan, 42.25, 34, 39, 37, 35.75, np.nan],
+            [40.75, 29.75, 42.25, 45.25, 42.5, 49, 40],
+            [np.nan, np.nan, 39, 44, 38.5, 45.75, 42.5],
+            [np.nan, np.nan, np.nan, 38.25, 43.25, 40.25, 40],
+            [np.nan, np.nan, np.nan, np.nan, 38.75, 37, np.nan]], 
             [[43, 39, 27, 32, 25, 38, np.nan],
             [np.nan, 41, 36, 31, 38, 48, np.nan],
             [41, 31, 43, 46, 39, 56, 40],
@@ -137,7 +143,7 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, np.nan, np.nan, np.nan, 39, 38, np.nan]], 
             [[29, 34, 26, 28, 15, 35, np.nan],
             [np.nan, 51, 28, 37, 36, 38, np.nan],
-            [44, np.nan, 30, 37, 39, 47, 35],
+            [44, 34.5, 30, 37, 39, 47, 35], #34.5 interpolated in time
             [np.nan, np.nan, 39, 41, 49, 42, 40],
             [np.nan, np.nan, np.nan, 40, 45, 42, 40],
             [np.nan, np.nan, np.nan, np.nan, 37, 32, np.nan]], 
@@ -176,7 +182,13 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [0, 17, 26, 25, 35, 34, 0], #Need to interpolate S220 (likely 0)
             [np.nan, np.nan, 22, 18, 29, 26, 13],
             [np.nan, np.nan, np.nan, 15, 18, 9, 10],
-            [np.nan, np.nan, np.nan, np.nan, 6, 5, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 6, 5, np.nan]], 
+            [[0, 0, 0, 0, 0, 0, np.nan],
+            [np.nan, 0, 0, 6, 0, 0, np.nan],
+            [0, 0, 11, 0, 21, 19, 0],
+            [np.nan, np.nan, 19, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]]]
 
 '''Times'''
 #Add dates as needed
@@ -184,7 +196,7 @@ times = np.array(['12-02-2022', '12-30-2022',
  '01-05-2023', '01-13-2023', '01-20-2023',
  '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
  '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
- '04-14-2023'])
+ '04-14-2023', '04-28-2023'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
@@ -312,7 +324,6 @@ plt.show()
 
 #%%
 '''SAVE DATA'''
-
 data_savepath = './Cleaned Data/'
 
 snow_s2.to_netcdf(data_savepath + '01_cleanedsnowdataS2.nc')

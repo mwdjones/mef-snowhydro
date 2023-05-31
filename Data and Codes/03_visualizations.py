@@ -133,12 +133,12 @@ custom_pal = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
 '''SNOW TIMESERIES AND KDE PLOTS'''
 
 ###Plot winter snow timeseries
-###S2
 fig = plt.figure(constrained_layout = True, 
-    figsize = (9,3))
+    figsize = (9,6))
 
-gs = GridSpec(1, 3, figure = fig)
+gs = GridSpec(2, 3, figure = fig)
 
+###S2
 #histogram
 ax1 = fig.add_subplot(gs[0, 0])
 sns.kdeplot(data = s2data_df, 
@@ -149,7 +149,7 @@ sns.kdeplot(data = s2data_df,
     fill = True
     )
 
-ax1.set_xlabel('Snow depth [cm]')
+ax1.set_xlabel(' ')
 #ax1.set_ylim(0, 1)
 sns.move_legend(ax1, "upper left")
 
@@ -167,22 +167,17 @@ sns.lineplot(data = s2data_df,
 
 ax2.set_xlim(min(s2data_df.time), max(s2data_df.time))
 ax2.set_ylim(0, 70)
-ax2.set_xlabel('Time')
+ax2.set_xlabel(' ')
 ax2.set_ylabel('Snow depth [cm]')
 
 plt.xticks(rotation=30)
-plt.suptitle('Snow Depths in S2')
-plt.savefig(save_path + 'snowPlots/' + 's2_kde_timeseries.pdf')
-plt.show()
+#plt.suptitle('Snow Depths in S2')
+#plt.savefig(save_path + 'snowPlots/' + 's2_kde_timeseries.pdf')
+#plt.show()
 
 ###S6
-fig = plt.figure(constrained_layout = True, 
-    figsize = (9,3))
-
-gs = GridSpec(1, 3, figure = fig)
-
 #histogram
-ax1 = fig.add_subplot(gs[0, 0])
+ax3 = fig.add_subplot(gs[1, 0])
 sns.kdeplot(data = s6data_df, 
     x = 'depths', 
     hue = 'zones', 
@@ -191,30 +186,30 @@ sns.kdeplot(data = s6data_df,
     fill = True
     )
 
-ax1.set_xlabel('Snow depth [cm]')
+ax3.set_xlabel('Snow depth [cm]')
 #ax1.set_ylim(0, 1)
-sns.move_legend(ax1, "upper left")
+sns.move_legend(ax3, "upper left")
 
 #time series
-ax2 = fig.add_subplot(gs[0, 1:3])
+ax4 = fig.add_subplot(gs[1, 1:3])
 sns.lineplot(data = s6data_df, 
     x = 'time',
     y = 'depths',
     hue = 'zones', 
  #   errorbar = 'ci', 
     palette = custom_pal, 
-    ax = ax2, 
+    ax = ax4, 
     legend = False
     )
 
-ax2.set_xlim(min(s6data_df.time), max(s6data_df.time))
-ax2.set_ylim(0, 70)
-ax2.set_xlabel('Time')
-ax2.set_ylabel('Snow depth [cm]')
+ax4.set_xlim(min(s6data_df.time), max(s6data_df.time))
+ax4.set_ylim(0, 70)
+ax4.set_xlabel('Time')
+ax4.set_ylabel('Snow depth [cm]')
 
 plt.xticks(rotation=30)
-plt.suptitle('Snow Depths in S6')
-plt.savefig(save_path + 'snowPlots/' + 's6_kde_timeseries.pdf')
+plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
+plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.pdf')
 plt.show()
 
 #%%
@@ -290,12 +285,17 @@ s2data_df = s2data_df.dropna(subset = ['zones'])
 s6data_df = s6data_df.dropna(subset = ['zones'])
 
 #Declare dataframe
-lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
+s2lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
+s6lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
 
-
+times = [pd.to_datetime('2022-12-02 00:00:00'), pd.to_datetime('2022-12-30 00:00:00'), pd.to_datetime('2023-01-05 00:00:00'), 
+         pd.to_datetime('2023-01-13 00:00:00'), pd.to_datetime('2023-01-20 00:00:00'), pd.to_datetime('2023-02-01 00:00:00'), 
+         pd.to_datetime('2023-02-10 00:00:00'), pd.to_datetime('2023-02-17 00:00:00'), pd.to_datetime('2023-02-24 00:00:00'), 
+         pd.to_datetime('2023-03-09 00:00:00'), pd.to_datetime('2023-03-17 00:00:00'), pd.to_datetime('2023-03-24 00:00:00'), 
+         pd.to_datetime('2023-03-31 00:00:00'), pd.to_datetime('2023-04-14 00:00:00')]
 #S2
 #Loop through the available times
-for t in set(s2data_df.time):
+for t in times:
     #Loop through regions
     for z in ['Upland', 'Bog', 'Lagg']:
         #Subset the snow data to match that time
@@ -317,13 +317,13 @@ for t in set(s2data_df.time):
         slope, r = calc_corr(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'], return_slope = True)
 
         #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S2']})])
+        s2lai_corr = pd.concat([s2lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S2']})])
 
         #Loop through the available times
 
 
 #S6       
-for t in set(s6data_df.time):
+for t in times:
     #Loop through regions
     for z in ['Upland', 'Bog', 'Lagg']:
         #Subset the snow data to match that time
@@ -345,24 +345,30 @@ for t in set(s6data_df.time):
         slope, r = calc_corr(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'], return_slope = True)
 
         #Append to dataframe
-        lai_corr = pd.concat([lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S6']})])
+        s6lai_corr = pd.concat([s6lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S6']})])
 
+#Reset indices for plotting
+s2lai_corr = s2lai_corr.reset_index(drop = True)
+s6lai_corr = s6lai_corr.reset_index(drop = True)
 
 #Plot
 sns.set_style('white')
-fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(5.5, 7),
-                        layout="constrained")
+fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(7, 7),
+                        layout="constrained", 
+                        sharex = True)
 
-#R^2 values
-for t in set(lai_corr.time):
+#R^2 values in S2
+for t in set(s2lai_corr.time):
     ax1.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
 
-sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['corr'],
-   hue = lai_corr['zone'], 
-   style = lai_corr['watershed'],
-   palette = custom_pal, 
-   s = 80,
-   linewidth = 0,
+sns.lineplot(x = pd.to_datetime(s2lai_corr['time']), y = s2lai_corr['corr'],
+   hue = s2lai_corr['zone'], 
+   style = s2lai_corr['watershed'],
+   palette = custom_pal,  
+   markers = True,
+   markeredgecolor = 'None',
+   markersize = 8,
+   linewidth = 2,
    ax = ax1)
 
 plt.xticks(rotation=30)
@@ -370,30 +376,30 @@ plt.xticks(rotation=30)
 
 ax1.set_ylim(0, 1)
 ax1.set_xlabel(' ')
-ax1.set_ylabel(r'4Ring LAI and Snow Depth $R^2$')
-ax1.yaxis.set_label_position("right")
-ax1.yaxis.tick_right()
+ax1.set_ylabel(r'5Ring LAI and Snow Depth $R^2$')
+ax1.legend(bbox_to_anchor = (1, 1))
 
-#Slope values
-for t in set(lai_corr.time):
-    ax2.vlines(pd.to_datetime(t), ymin = -0.5, ymax = 0.5, colors = 'silver', zorder = 1)
+#R^2 values in S6
+for t in set(s6lai_corr.time):
+    ax2.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
 
-sns.scatterplot(x = pd.to_datetime(lai_corr['time']), y = lai_corr['slope'],
-   hue = lai_corr['zone'], 
-   style = lai_corr['watershed'],
+sns.lineplot(x = pd.to_datetime(s6lai_corr['time']), y = s6lai_corr['corr'],
+   hue = s6lai_corr['zone'], 
+   style = s6lai_corr['watershed'],
    palette = custom_pal, 
-   s = 80,
-   linewidth = 0,
-   ax = ax2)
+   markers = True,
+   markeredgecolor = 'None',
+   markersize = 8,
+   linewidth = 2,
+   ax = ax2, 
+   legend = False)
 
 plt.xticks(rotation=30)
 #plt.legend(loc = 'upper right')
 
-ax2.set_ylim(-0.2, 0.2)
+ax2.set_ylim(0, 1)
 ax2.set_xlabel(' ')
-ax2.set_ylabel(r'4Ring LAI and Snow Depth $\beta$')
-ax2.yaxis.set_label_position("right")
-ax2.yaxis.tick_right()
+ax2.set_ylabel(r'5Ring LAI and Snow Depth $R^2$')
 
 plt.savefig(save_path + 'laiPlots/' + 'lai_SD_correlations.pdf')
 plt.show()

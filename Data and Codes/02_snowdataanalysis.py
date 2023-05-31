@@ -124,6 +124,10 @@ s6LAI_grouped = s6LAI_groupednames.merge(s6LAI_groupednums, how = 'outer')
 s2LAI_grouped.Zone =[col.strip() for col in s2LAI_grouped.Zone]
 s6LAI_grouped.Zone =[col.strip() for col in s6LAI_grouped.Zone]
 
+#Save cleaned files
+s2LAI_grouped.to_csv(import_path + '01_cleanedlaidataS2.csv')
+s6LAI_grouped.to_csv(import_path + '01_cleanedlaidataS6.csv')
+
 # %%
 
 '''TIMESERIES BASICS'''
