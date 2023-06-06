@@ -31,6 +31,7 @@ directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/
 save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/soilPlots/'
 import_path_frost = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
 all_files = glob.glob(os.path.join(directory, 'S*.txt'))
+bog_files = glob.glob(os.path.join(directory, 'S*.csv'))
 
 #Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
 precip_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
@@ -291,22 +292,82 @@ for file in all_files:
         df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
     
     #Plot soil moisture
-    #plotMoisture(df, precip, save_path)
+    plotMoisture(df, precip, save_path)
 
     #Plot soil temperature
-    #plotTemp(df, precip, save_path)
+    plotTemp(df, precip, save_path)
 
     #plot soil temp heatmap
-    #plotTemp_Heatmap(df, save_path)
+    plotTemp_Heatmap(df, save_path)
 
     #plot soil moist heatmap
-    #plotMoisture_Heatmap(df, save_path)
+    plotMoisture_Heatmap(df, save_path)
     
     file_list.append(df)
     
 #Concatenate all files in list
 sensor_data = pd.concat(file_list, axis = 0, ignore_index = True)
 
+#%%
+### Bog sensors
+bog_file_list = []
+for file in bog_files:
+    df = pd.read_csv(file, 
+                     sep = ',', 
+                     header = 1, 
+                     names = ['DateTime', 'WaterTemp_C',
+                              'Host Connected', 'End of File'], 
+                     parse_dates = ['DateTime'])
+    
+    df['SensorName'] = file[file.find('\S')+1:file.find('\S')+5]
+    df['SensorDepth_cm'] = file[file.find('\S')+6:file.find('\S')+8]
+    
+    #for i in range(0, len(df['DateTime'])):
+    #    #Converts to datetime format
+    #   df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
+    #    #Rounds to the nearest hour
+    #    df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
+
+    bog_file_list.append(df)
+
+#Concatenate all files in list
+bog_sensor_data = pd.concat(bog_file_list, axis = 0, ignore_index = True)
+
+#Plot bog data
+for site in set(bog_sensor_data.SensorName):
+    data = bog_sensor_data[bog_sensor_data.SensorName == site].reset_index(drop = True)
+
+    fig, ax = plt.subplots(figsize=(6, 4),
+                    layout="constrained")
+    
+    #Precip
+    #ax2 = ax.twinx()
+    #Psnip = snipPrecip(precip, min(df.DateTime), max(df.DateTime))
+    #ax2.bar(Psnip.Date, Psnip.P_in, color = 'lightgrey')
+
+    #ax2.set_ylabel("Precipitation [in]")
+
+    #Soil Temperature
+    for depth in set(data.SensorDepth_cm):
+        plt.plot(data[data.SensorDepth_cm == depth].DateTime, data[data.SensorDepth_cm == depth].WaterTemp_C, label = str(depth) + 'cm')
+    
+    ax.set_ylabel("Water Temperature [C]")
+
+    plt.xlabel("Date")
+    plt.title(str(data.SensorName[0]))
+
+    plt.xlim(min(data.DateTime), max(data.DateTime))
+
+    #ax.set_zorder(ax2.get_zorder()+1)
+    ax.patch.set_visible(False)
+
+    ax.legend()
+
+    #plt.show()
+    plt.savefig(save_path + "tempfig" + str(data.SensorName[0]) + "_" + str(df.SensorDepth_cm[0]) + ".pdf")
+    plt.savefig(save_path + "tempfig" + str(data.SensorName[0]) + "_" + str(df.SensorDepth_cm[0]) + ".jpg")
+
+    plt.show()
 #%%
 
 '''EXPORT CSV FILE'''
