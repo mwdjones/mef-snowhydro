@@ -119,6 +119,11 @@ def calc_corr(x, y, return_slope = False):
         return slope, r_value**2
     else:
         return r_value**2
+    
+def calc_corr_spearman(x, y):
+    r_value, p_value = scipy.stats.spearmanr(x, y, nan_policy = 'omit')
+    
+    return r_value, p_value
    
 
 #%%
@@ -127,7 +132,10 @@ def calc_corr(x, y, return_slope = False):
 save_path = "../Figures/"
 
 #Plotting Specifics
-custom_pal = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
+custom_col = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
+custom_pal = {'Upland': '#1b9e77', 
+              'Lagg': '#d95f02', 
+              'Bog': '#7570b3'}
 
 #%%
 '''SNOW TIMESERIES AND KDE PLOTS'''
@@ -208,7 +216,7 @@ ax4.set_xlabel('Time')
 ax4.set_ylabel('Snow depth [cm]')
 
 plt.xticks(rotation=30)
-plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
+#plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
 plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.pdf')
 plt.show()
 
@@ -285,14 +293,15 @@ s2data_df = s2data_df.dropna(subset = ['zones'])
 s6data_df = s6data_df.dropna(subset = ['zones'])
 
 #Declare dataframe
-s2lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
-s6lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'slope' : [], 'watershed' : []})
+s2lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'pvalue' : [], 'watershed' : []})
+s6lai_corr = pd.DataFrame({'time' : [], 'zone' : [], 'corr' : [], 'pvalue' : [], 'watershed' : []})
 
 times = [pd.to_datetime('2022-12-02 00:00:00'), pd.to_datetime('2022-12-30 00:00:00'), pd.to_datetime('2023-01-05 00:00:00'), 
          pd.to_datetime('2023-01-13 00:00:00'), pd.to_datetime('2023-01-20 00:00:00'), pd.to_datetime('2023-02-01 00:00:00'), 
          pd.to_datetime('2023-02-10 00:00:00'), pd.to_datetime('2023-02-17 00:00:00'), pd.to_datetime('2023-02-24 00:00:00'), 
          pd.to_datetime('2023-03-09 00:00:00'), pd.to_datetime('2023-03-17 00:00:00'), pd.to_datetime('2023-03-24 00:00:00'), 
-         pd.to_datetime('2023-03-31 00:00:00'), pd.to_datetime('2023-04-14 00:00:00')]
+         pd.to_datetime('2023-03-31 00:00:00'), pd.to_datetime('2023-04-14 00:00:00'), pd.to_datetime('2023-04-28 00:00:00'), 
+         pd.to_datetime('2023-05-05 00:00:00')]
 #S2
 #Loop through the available times
 for t in times:
@@ -314,10 +323,10 @@ for t in times:
         lai_subset.sort_values('Stake_ID')
   
         #Calculate the correlation between the snowdepths and the LAI
-        slope, r = calc_corr(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'], return_slope = True)
+        r, p = calc_corr_spearman(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'])
 
         #Append to dataframe
-        s2lai_corr = pd.concat([s2lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S2']})])
+        s2lai_corr = pd.concat([s2lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'pvalue': [p], 'watershed': ['S2']})])
 
         #Loop through the available times
 
@@ -342,10 +351,10 @@ for t in times:
         lai_subset.sort_values('Stake_ID')
   
         #Calculate the correlation between the snowdepths and the LAI
-        slope, r = calc_corr(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'], return_slope = True)
+        r, p = calc_corr_spearman(snow_subset['depths'], lai_subset['OLS Prediction Ring 5'])
 
         #Append to dataframe
-        s6lai_corr = pd.concat([s6lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'slope': [slope], 'watershed': ['S6']})])
+        s6lai_corr = pd.concat([s6lai_corr, pd.DataFrame({'time': [t], 'zone': [z], 'corr': [r], 'pvalue': [p], 'watershed': ['S6']})])
 
 #Reset indices for plotting
 s2lai_corr = s2lai_corr.reset_index(drop = True)
@@ -359,7 +368,7 @@ fig, [ax1, ax2] = plt.subplots(ncols=1, nrows=2, figsize=(7, 7),
 
 #R^2 values in S2
 for t in set(s2lai_corr.time):
-    ax1.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
+    ax1.vlines(pd.to_datetime(t), ymin = -1, ymax = 1, colors = 'silver', zorder = 1)
 
 sns.lineplot(x = pd.to_datetime(s2lai_corr['time']), y = s2lai_corr['corr'],
    hue = s2lai_corr['zone'], 
@@ -374,14 +383,14 @@ sns.lineplot(x = pd.to_datetime(s2lai_corr['time']), y = s2lai_corr['corr'],
 plt.xticks(rotation=30)
 #plt.legend(loc = 'upper right')
 
-ax1.set_ylim(0, 1)
+ax1.set_ylim(-1, 1)
 ax1.set_xlabel(' ')
 ax1.set_ylabel(r'5Ring LAI and Snow Depth $R^2$')
 ax1.legend(bbox_to_anchor = (1, 1))
 
 #R^2 values in S6
 for t in set(s6lai_corr.time):
-    ax2.vlines(pd.to_datetime(t), ymin = 0, ymax = 1, colors = 'silver', zorder = 1)
+    ax2.vlines(pd.to_datetime(t), ymin = -1, ymax = 1, colors = 'silver', zorder = 1)
 
 sns.lineplot(x = pd.to_datetime(s6lai_corr['time']), y = s6lai_corr['corr'],
    hue = s6lai_corr['zone'], 
@@ -397,7 +406,7 @@ sns.lineplot(x = pd.to_datetime(s6lai_corr['time']), y = s6lai_corr['corr'],
 plt.xticks(rotation=30)
 #plt.legend(loc = 'upper right')
 
-ax2.set_ylim(0, 1)
+ax2.set_ylim(-1, 1)
 ax2.set_xlabel(' ')
 ax2.set_ylabel(r'5Ring LAI and Snow Depth $R^2$')
 
@@ -463,6 +472,53 @@ plt.savefig(save_path + 'laiPlots/' + 'sampCorrPlots.pdf')
 plt.show()
 
 #%%
+'''LAI and Snow heatmap version'''
+import matplotlib.dates as mdates
+
+#Create copy data frame masked for p values below 0.05
+s2lai_corr_pivot = s2lai_corr.pivot('zone', 'time', 'corr')
+s2lai_pvalues = s2lai_corr.pivot('zone', 'time', 'pvalue')
+s2lai_heat = s2lai_corr_pivot.where(s2lai_pvalues < 0.05)
+
+s6lai_corr_pivot = s6lai_corr.pivot('zone', 'time', 'corr')
+s6lai_pvalues = s6lai_corr.pivot('zone', 'time', 'pvalue')
+s6lai_heat = s6lai_corr_pivot.where(s6lai_pvalues < 0.05)
+
+
+fig, [ax1, ax2] = plt.subplots(2, 1, figsize = (8,4), 
+                            sharex = True, 
+                            layout="constrained")
+
+sns.heatmap(s2lai_heat,
+            annot = s2lai_heat,
+            fmt = '.2f',
+            ax = ax1, 
+            vmin = -1, vmax = 1, 
+            cmap = 'viridis', 
+            cbar_kws={'label': 'Spearman Correlation R'})
+
+sns.heatmap(s6lai_heat,
+            annot = s6lai_heat,
+            fmt = '.2f', ax = ax2, 
+            vmin = -1, vmax = 1, 
+            cmap = 'viridis', 
+            cbar = False)
+
+x_ticks = np.array(['12-02-2022', '12-30-2022',
+ '01-05-2023', '01-13-2023', '01-20-2023',
+ '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
+ '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
+ '04-14-2023', '04-28-2023', '05-05-2023'])
+
+ax1.set_xlabel(' ')
+ax1.set_ylabel('S2')
+
+ax2.set_xlabel('Time')
+ax2.set_ylabel('S6')
+ax2.set_xticklabels(x_ticks)
+plt.xticks(rotation=30)
+
+#%%
 '''FROST DEPTHS'''
 
 #Plot Frost depths
@@ -489,7 +545,7 @@ plt.show()
 ylimit = 90
 ylimit_frost = 25
 
-def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, labs = False):
+def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, snowlabs = False, frostlabs = False):
     ax = fig.add_subplot(gs[gsx, gsy])
 
     #Precipitation
@@ -543,13 +599,20 @@ def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, la
        ax.set_xlabel(' ')
     else: 
        ax.tick_params(axis='x', rotation=30)
+       ax.set_xlabel('Time')
 
-    if (labs):
+    if (snowlabs):
         ax.set_ylabel('Snow Depth [cm]')
-        ax2.set_ylabel('Frost Depth [cm]')
     else:
         ax.set_ylabel(' ')
+
+
+
+    if (frostlabs):
+        ax2.set_ylabel('Frost Depth [cm]')
+    else:
         ax2.set_ylabel(' ')
+
     ax.set_xlim(min(data.time), max(data.time))
     ax.set_ylim(-ylimit, ylimit)
 
@@ -559,8 +622,8 @@ def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, la
 
 
 ### S2
-fig = plt.figure(layout="constrained", figsize = (4, 4))
-gs = GridSpec(3, 1, wspace = 0.40, hspace = 0.20)
+fig = plt.figure(layout="constrained", figsize = (8, 4))
+gs = GridSpec(3, 2, wspace = 0.40, hspace = 0.20)
 #Axis 1 - Upland
 snowTemp_Upland = s2data_df[s2data_df.zones == 'Upland']
 frost_Upland = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Upland')]
@@ -572,7 +635,7 @@ plotSnowSeries(fig, gs, 0, 0, snowTemp_Upland, frost_UplandFilled, '#1b9e77')
 snowTemp_Lagg = s2data_df[s2data_df.zones == 'Lagg']
 frost_Lagg = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Lagg')]
 frost_LaggFilled = fillFrostSeries(frost_Lagg, min(snowTemp_Lagg.time), max(snowTemp_Lagg.time))
-plotSnowSeries(fig, gs, 1, 0, snowTemp_Lagg, frost_LaggFilled, '#7570b3', labs = True)
+plotSnowSeries(fig, gs, 1, 0, snowTemp_Lagg, frost_LaggFilled, '#7570b3', snowlabs = True)
 
 #Axis 3 - Bog
 snowTemp_Bog = s2data_df[s2data_df.zones == 'Bog']
@@ -580,33 +643,23 @@ frost_Bog = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Bog')]
 frost_BogFilled = fillFrostSeries(frost_Bog, min(snowTemp_Bog.time), max(snowTemp_Bog.time))
 plotSnowSeries(fig, gs, 2, 0, snowTemp_Bog, frost_BogFilled, '#d95f02', xticks = True)
 
-plt.suptitle('S2')
-plt.savefig(save_path + 'S2frost_snow_timeseries.pdf', bbox_inches = 'tight')
-plt.savefig(save_path + 'S2frost_snow_timeseries.svg', bbox_inches = 'tight')
-plt.show()
-
-
-### S6
-fig = plt.figure(layout="constrained", figsize = (4, 4))
-gs = GridSpec(3, 1, wspace = 0.40, hspace = 0.20)
 #Axis 1 - Upland
 snowTemp_Upland = s6data_df[s6data_df.zones == 'Upland']
 frost_Upland = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Upland')]
 frost_UplandFilled = fillFrostSeries(frost_Upland, min(snowTemp_Upland.time), max(snowTemp_Upland.time))
 #frost_UplandFilled['FROST.1'] = frost_UplandFilled['FROST.1'].fillna(0)
-plotSnowSeries(fig, gs, 0, 0, snowTemp_Upland, frost_UplandFilled, '#1b9e77')
+plotSnowSeries(fig, gs, 0, 1, snowTemp_Upland, frost_UplandFilled, '#1b9e77')
 #Axis 2 - Lagg
 snowTemp_Lagg = s6data_df[s6data_df.zones == 'Lagg']
 frost_Lagg = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Lagg')]
 frost_LaggFilled = fillFrostSeries(frost_Lagg, min(snowTemp_Lagg.time), max(snowTemp_Lagg.time))
-plotSnowSeries(fig, gs, 1, 0, snowTemp_Lagg, frost_LaggFilled, '#7570b3', labs = True)
+plotSnowSeries(fig, gs, 1, 1, snowTemp_Lagg, frost_LaggFilled, '#7570b3', frostlabs = True)
 #Axis 3 - Bog
 snowTemp_Bog = s6data_df[s6data_df.zones == 'Bog']
 frost_Bog = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Bog')]
 frost_BogFilled = fillFrostSeries(frost_Bog, min(snowTemp_Bog.time), max(snowTemp_Bog.time))
-plotSnowSeries(fig, gs, 2, 0, snowTemp_Bog, frost_BogFilled, '#d95f02', xticks = True)
+plotSnowSeries(fig, gs, 2, 1, snowTemp_Bog, frost_BogFilled, '#d95f02', xticks = True)
 
-plt.suptitle('S6')
 plt.savefig(save_path + 'S6frost_snow_timeseries.pdf', bbox_inches = 'tight')
 plt.savefig(save_path + 'S6frost_snow_timeseries.svg', bbox_inches = 'tight')
 plt.show()
