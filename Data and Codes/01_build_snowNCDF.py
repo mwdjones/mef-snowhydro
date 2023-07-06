@@ -97,7 +97,13 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [0, 0, 17, 0, 0, 0],
             [np.nan, 0, 0, 28, 0, 0],
             [np.nan, np.nan, 0, 3, 16, 0],
-            [np.nan, np.nan, np.nan, 0, 3, 0]]]
+            [np.nan, np.nan, np.nan, 0, 3, 0]], 
+            [[np.nan, 0, 0, np.nan, np.nan, np.nan],
+            [0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0],
+            [np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, 13, 11, np.nan], # S214 interpolated (13)
@@ -188,6 +194,12 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [0, 0, 11, 0, 21, 19, 0],
             [np.nan, np.nan, 19, 0, 0, 0, 0],
             [np.nan, np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]], 
+            [[0, 0, 0, 0, 0, 0, np.nan],
+            [np.nan, 0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0, 0],
             [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]]]
 
 '''Times'''
@@ -196,7 +208,7 @@ times = np.array(['12-02-2022', '12-30-2022',
  '01-05-2023', '01-13-2023', '01-20-2023',
  '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
  '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
- '04-14-2023', '04-28-2023'])
+ '04-14-2023', '04-28-2023', '05-05-2023'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system

@@ -193,4 +193,4 @@ table = sm.stats.anova_lm(snowANOVA_s2, typ=1, test = 'Chisq')
 print(table)
 
 
-# %%
+#%%
