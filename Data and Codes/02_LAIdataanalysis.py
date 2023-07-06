@@ -438,6 +438,11 @@ s6bog_ANOVA = scipy.stats.f_oneway(s6bog['LAI 5Ring'],
 print(s6bog_ANOVA)
 
 # %%
+#Plotting Specifics
+custom_col = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
+custom_pal = {'Upland': '#1b9e77', 
+              'Lagg': '#d95f02', 
+              'Bog': '#7570b3'}
 
 fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
                         layout="constrained")
@@ -449,13 +454,23 @@ sns.boxplot(data = pd.concat([s2LAI_winter_grouped, s6LAI_winter_grouped], keys 
     #boxprops={"facecolor": (.4, .6, .8, .5)},
     #medianprops={"color": "red"},
     hue = 'Zone',
+    palette = custom_pal,
     ax = ax)
+
+#ANOVA labels
+ax.text(-0.27, 3.0, 'A', fontweight = 'bold', horizontalalignment = 'center')
+ax.text(0, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
+ax.text(0.27, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
+ax.text(0.73, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
+ax.text(1.0, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
+ax.text(1.27, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
+
+
 ax.set_ylabel('LAI Ring 5')
 ax.set_xlabel('Watershed')
-at = offsetbox.AnchoredText(
-    "S2", prop=dict(size=15), frameon=True, loc='lower right')
-at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
-ax.add_artist(at)
+ax.set_ylim(0, 3.5)
+ax.legend(bbox_to_anchor = (1.3, 1))
+
 
 
 # %%

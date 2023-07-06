@@ -149,17 +149,34 @@ gs = GridSpec(2, 3, figure = fig)
 ###S2
 #histogram
 ax1 = fig.add_subplot(gs[0, 0])
-sns.kdeplot(data = s2data_df, 
-    x = 'depths', 
+sns.stripplot(data = s2data_df, 
+    x = 'zones', 
+    y = 'depths',
     hue = 'zones', 
     palette = custom_pal, 
-    #multiple = 'fill' 
-    fill = True
+    order = ['Upland', 'Lagg', 'Bog'], 
+    dodge = False
+)
+sns.boxplot(data = s2data_df, 
+    x = 'zones', 
+    y = 'depths',
+    order = ['Upland', 'Lagg', 'Bog'], 
+    dodge = False, 
+    showfliers=False,
+    showbox=False,
+    showcaps=False,
+    showmeans=True,
+    meanline=True,
+    meanprops={'color': 'silver', 'ls': '-', 'lw': 3},
+    medianprops={'visible': False},
+    whiskerprops={'visible': False},
+    zorder = 10
     )
 
 ax1.set_xlabel(' ')
-#ax1.set_ylim(0, 1)
-sns.move_legend(ax1, "upper left")
+ax1.set_ylabel('Snow depths [cm]')
+ax1.set_ylim(0, 90)
+ax1.legend(bbox_to_anchor = (-0.25, 1))
 
 #time series
 ax2 = fig.add_subplot(gs[0, 1:3])
@@ -174,9 +191,9 @@ sns.lineplot(data = s2data_df,
     )
 
 ax2.set_xlim(min(s2data_df.time), max(s2data_df.time))
-ax2.set_ylim(0, 70)
+ax2.set_ylim(0, 90)
 ax2.set_xlabel(' ')
-ax2.set_ylabel('Snow depth [cm]')
+ax2.set_ylabel(' ')
 
 plt.xticks(rotation=30)
 #plt.suptitle('Snow Depths in S2')
@@ -186,17 +203,33 @@ plt.xticks(rotation=30)
 ###S6
 #histogram
 ax3 = fig.add_subplot(gs[1, 0])
-sns.kdeplot(data = s6data_df, 
-    x = 'depths', 
+sns.stripplot(data = s6data_df, 
+    x = 'zones', 
+    y = 'depths',
     hue = 'zones', 
     palette = custom_pal, 
-    #multiple = 'fill', 
-    fill = True
+    order = ['Upland', 'Lagg', 'Bog'], 
+    dodge = False
+)
+sns.boxplot(data = s6data_df, 
+    x = 'zones', 
+    y = 'depths', 
+    order = ['Upland', 'Lagg', 'Bog'], 
+    dodge = False, 
+    showfliers=False,
+    showbox=False,
+    showcaps=False,
+    showmeans=True,
+    meanline=True,
+    meanprops={'color': 'silver', 'ls': '-', 'lw': 3},
+    medianprops={'visible': False},
+    whiskerprops={'visible': False},
+    zorder = 10
     )
 
-ax3.set_xlabel('Snow depth [cm]')
-#ax1.set_ylim(0, 1)
-sns.move_legend(ax3, "upper left")
+ax3.set_ylabel('Snow Depth [cm]')
+ax3.set_ylim(0, 90)
+ax3.legend([],[], frameon=False)
 
 #time series
 ax4 = fig.add_subplot(gs[1, 1:3])
@@ -211,9 +244,9 @@ sns.lineplot(data = s6data_df,
     )
 
 ax4.set_xlim(min(s6data_df.time), max(s6data_df.time))
-ax4.set_ylim(0, 70)
+ax4.set_ylim(0, 90)
 ax4.set_xlabel('Time')
-ax4.set_ylabel('Snow depth [cm]')
+ax4.set_ylabel(' ')
 
 plt.xticks(rotation=30)
 #plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
