@@ -174,8 +174,33 @@ tukey.plot.test <- TukeyHSD(tukey.plot.aov)
 plot(tukey.plot.test, las = 1, cex.axis=0.4)
 ```
 
+```{r}
+#Import Frost Data
+frost = read.csv("./Cleaned Data/2023frost_data.csv")
 
+head(frost)
+```
 
+```{r}
+#Set time series
+frost_ts = ts(frost$FROST.1)
+zones_ts = ts(frost$Zones)
+watershed_ts = ts(frost$Watershed)
+date_ts = ts(frost$DATE)
+```
+
+```{r}
+aov.p = aov(frost_ts ~ (factor(zones_ts):factor(watershed_ts)), frost)
+summary(aov.p)
+```
+
+```{r}
+tukey <- TukeyHSD(aov.p)
+plot(tukey, las = 1, cex.axis=0.4)
+```
+```{r}
+print(tukey)
+```
 
 
 

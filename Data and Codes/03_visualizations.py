@@ -251,6 +251,7 @@ ax4.set_ylabel(' ')
 plt.xticks(rotation=30)
 #plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
 plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.pdf')
+plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.jpg')
 plt.show()
 
 #%%
@@ -578,7 +579,12 @@ plt.show()
 ylimit = 90
 ylimit_frost = 25
 
-def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, snowlabs = False, frostlabs = False):
+def plotSnowSeries(fig, gs, gsx, gsy,
+                    data, frostData,
+                    color,
+                    zonelab,
+                    xticks = False, snowlabs = False, frostlabs = False):
+    
     ax = fig.add_subplot(gs[gsx, gsy])
 
     #Precipitation
@@ -651,6 +657,9 @@ def plotSnowSeries(fig, gs, gsx, gsy, data, frostData, color, xticks = False, sn
 
     ax2.set_ylim(-ylimit_frost, ylimit_frost)
     ax2.invert_yaxis()
+
+    #Add label 
+    ax.text(pd.to_datetime('2023-05-01'), -80, zonelab, horizontalalignment = 'right')
     
 
 
@@ -662,36 +671,36 @@ snowTemp_Upland = s2data_df[s2data_df.zones == 'Upland']
 frost_Upland = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Upland')]
 frost_UplandFilled = fillFrostSeries(frost_Upland, min(snowTemp_Upland.time), max(snowTemp_Upland.time))
 #frost_UplandFilled['FROST.1'] = frost_UplandFilled['FROST.1'].fillna(0)
-plotSnowSeries(fig, gs, 0, 0, snowTemp_Upland, frost_UplandFilled, '#1b9e77')
+plotSnowSeries(fig, gs, 0, 0, snowTemp_Upland, frost_UplandFilled, '#1b9e77', 'S2 Upland')
 
 #Axis 2 - Lagg
 snowTemp_Lagg = s2data_df[s2data_df.zones == 'Lagg']
 frost_Lagg = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Lagg')]
 frost_LaggFilled = fillFrostSeries(frost_Lagg, min(snowTemp_Lagg.time), max(snowTemp_Lagg.time))
-plotSnowSeries(fig, gs, 1, 0, snowTemp_Lagg, frost_LaggFilled, '#7570b3', snowlabs = True)
+plotSnowSeries(fig, gs, 1, 0, snowTemp_Lagg, frost_LaggFilled, '#d95f02', 'S2 Lagg', snowlabs = True)
 
 #Axis 3 - Bog
 snowTemp_Bog = s2data_df[s2data_df.zones == 'Bog']
 frost_Bog = frost[(frost.Watershed == 'S2') & (frost.Zones == 'Bog')]
 frost_BogFilled = fillFrostSeries(frost_Bog, min(snowTemp_Bog.time), max(snowTemp_Bog.time))
-plotSnowSeries(fig, gs, 2, 0, snowTemp_Bog, frost_BogFilled, '#d95f02', xticks = True)
+plotSnowSeries(fig, gs, 2, 0, snowTemp_Bog, frost_BogFilled, '#7570b3', 'S2 Bog', xticks = True)
 
 #Axis 1 - Upland
 snowTemp_Upland = s6data_df[s6data_df.zones == 'Upland']
 frost_Upland = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Upland')]
 frost_UplandFilled = fillFrostSeries(frost_Upland, min(snowTemp_Upland.time), max(snowTemp_Upland.time))
 #frost_UplandFilled['FROST.1'] = frost_UplandFilled['FROST.1'].fillna(0)
-plotSnowSeries(fig, gs, 0, 1, snowTemp_Upland, frost_UplandFilled, '#1b9e77')
+plotSnowSeries(fig, gs, 0, 1, snowTemp_Upland, frost_UplandFilled, '#1b9e77', 'S6 Upland')
 #Axis 2 - Lagg
 snowTemp_Lagg = s6data_df[s6data_df.zones == 'Lagg']
 frost_Lagg = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Lagg')]
 frost_LaggFilled = fillFrostSeries(frost_Lagg, min(snowTemp_Lagg.time), max(snowTemp_Lagg.time))
-plotSnowSeries(fig, gs, 1, 1, snowTemp_Lagg, frost_LaggFilled, '#7570b3', frostlabs = True)
+plotSnowSeries(fig, gs, 1, 1, snowTemp_Lagg, frost_LaggFilled, '#d95f02', 'S6 Lagg', frostlabs = True)
 #Axis 3 - Bog
 snowTemp_Bog = s6data_df[s6data_df.zones == 'Bog']
 frost_Bog = frost[(frost.Watershed == 'S6') & (frost.Zones == 'Bog')]
 frost_BogFilled = fillFrostSeries(frost_Bog, min(snowTemp_Bog.time), max(snowTemp_Bog.time))
-plotSnowSeries(fig, gs, 2, 1, snowTemp_Bog, frost_BogFilled, '#d95f02', xticks = True)
+plotSnowSeries(fig, gs, 2, 1, snowTemp_Bog, frost_BogFilled, '#7570b3', 'S6 Bog', xticks = True)
 
 plt.savefig(save_path + 'S6frost_snow_timeseries.pdf', bbox_inches = 'tight')
 plt.savefig(save_path + 'S6frost_snow_timeseries.svg', bbox_inches = 'tight')
