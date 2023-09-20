@@ -577,7 +577,7 @@ plt.show()
 '''SNOW AND FROST TIME SERIES'''
 
 ylimit = 90
-ylimit_frost = 25
+ylimit_frost = 40
 
 def plotSnowSeries(fig, gs, gsx, gsy,
                     data, frostData,
@@ -613,14 +613,17 @@ def plotSnowSeries(fig, gs, gsx, gsy,
 
     sns.lineplot(x = frostData.DATE, 
                  y = frostData['FROST.1'], 
-                 color = color, 
-                 ci = None,
+                 color = 'silver', 
+                 estimator = None,
+                 units = frostData['STAKE NO'], 
                  ax = ax2)
-    line = plt.gca().lines
-    plt.fill_between(line[0].get_xdata(), 0, line[0].get_ydata(),
-                     color = color, 
-                     alpha = 0.4)
     
+    #Mean snow series
+    sns.lineplot(x = frostData.DATE, 
+                 y = frostData['FROST.1'], 
+                ax = ax2,  
+                ci = None, 
+                color = color)
     
     #hline
     ax.axhline(y = 0, xmin = 0, xmax = 1, color = 'silver')

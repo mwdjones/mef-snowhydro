@@ -37,7 +37,8 @@ s6data = na.omit(s6data)
 
 ```{r}
 #Check data
-head(s2data)
+s2data
+
 ```
 
 ```{r}
