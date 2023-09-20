@@ -75,6 +75,11 @@ for idx,row in frost.iterrows():
 #For timestamp rounding 
 dt_format = "%Y-%m-%d %H:%M"
 
+#Import S2 Forest Met Station Data
+met_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/ATM/'
+S2Fmet = pd.read_csv(met_directory + '01_CleanedS2F.csv', 
+                    parse_dates = ['TIMESTAMP'])
+
 #%%
 '''FUNCTIONS'''
 
@@ -89,37 +94,43 @@ def roundTime(dt=None, roundTo=60):
    rounding = (seconds+roundTo/2) // roundTo * roundTo
    return dt + datetime.timedelta(0,rounding-seconds,-dt.microsecond)
 
-def plotMoisture(df, P, save_path):
-    fig, ax = plt.subplots(figsize=(6, 4),
+def plotMoisture(df, P, met, save_path):
+    fig, [ax0, ax1] = plt.subplots(2, 1, 
+                        figsize=(6, 4),
+                        sharex=True,
                         layout="constrained")
     
     
     #Soil Moisture
-    ax.plot(df.DateTime, df.SoilMoist_15cm, '-r',
+    ax1.plot(df.DateTime, df.SoilMoist_15cm, '-r',
      label = '15cm')
-    ax.plot(df.DateTime, df.SoilMoist_30cm, '-b',
+    ax1.plot(df.DateTime, df.SoilMoist_30cm, '-b',
      label = '30cm')
-    ax.plot(df.DateTime, df.SoilMoist_45cm, '-g',
+    ax1.plot(df.DateTime, df.SoilMoist_45cm, '-g',
      label = '45cm')
     
-    ax.set_ylabel("Soil Moisture")
+    ax1.set_ylabel("Soil Moisture")
 
     #Precip
-    ax2 = ax.twinx()
+    ax00 = ax0.twinx()
     Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
-    ax2.bar(Psnip.Date, Psnip.P_in, color = 'lightgrey', zorder = -2)
+    ax00.bar(Psnip.Date, Psnip.P_in, color = 'lightblue', zorder = -2)
 
-    ax2.set_ylabel("Precipitation [in]")
+    ax00.set_ylabel("Precipitation [in]")
+
+    #Air Temp
+    #Tsnip = snipTemp(met, min(df.DateTime), max(df.DateTime))
+    ax0.plot(met.TIMESTAMP, met.Air_TempC_Avg, color = 'orangered', alpha = 0.5, zorder = -1)
+    roll = met["Air_TempC_Avg"].rolling(672).mean()
+    ax0.plot(met.TIMESTAMP, roll, linewidth = 1, color = 'orangered')
+    ax0.set_ylabel("Air Temperature [C]")
 
     plt.xlabel("Date")
     plt.title(str(df.SensorName[0]))
 
     plt.xlim(min(df.DateTime), max(df.DateTime))
 
-    ax.set_zorder(ax2.get_zorder()+1)
-    ax.patch.set_visible(False)
-
-    ax.legend()
+    ax1.legend()
 
     #plt.show()
     plt.savefig(save_path + "moistfig" + str(df.SensorName[0]) + ".pdf")
@@ -127,42 +138,51 @@ def plotMoisture(df, P, save_path):
 
     plt.show()
 
-def plotTemp(df, P, save_path):
-    fig, ax = plt.subplots(figsize=(6, 4),
-                    layout="constrained")
+def plotTemp(df, P, met, save_path):
+    fig, [ax0, ax1] = plt.subplots(2, 1, 
+                        figsize=(6, 4),
+                        sharex=True,
+                        layout="constrained")
     
     #Precip
-    ax2 = ax.twinx()
+    ax00 = ax0.twinx()
     Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
-    ax2.bar(Psnip.Date, Psnip.P_in, color = 'lightgrey')
+    ax00.bar(Psnip.Date, Psnip.P_in, color = 'lightblue', zorder = -2)
 
-    ax2.set_ylabel("Precipitation [in]")
+    ax00.set_ylabel("Precipitation [in]")
+
+    #Air Temp
+    #Tsnip = snipTemp(met, min(df.DateTime), max(df.DateTime))
+    ax0.plot(met.TIMESTAMP, met.Air_TempC_Avg, color = 'orangered', alpha = 0.5, zorder = -1)
+    roll = met["Air_TempC_Avg"].rolling(672).mean()
+    ax0.plot(met.TIMESTAMP, roll, linewidth = 1, color = 'orangered')
+    ax0.set_ylabel("Air Temperature [C]")
 
     #Soil Temperature
-    ax.plot(df.DateTime, df.SoilTemp1,
+    ax1.plot(df.DateTime, df.SoilTemp1,
      label = '5cm')
-    ax.plot(df.DateTime, df.SoilTemp2,
+    ax1.plot(df.DateTime, df.SoilTemp2,
      label = '15cm')
-    ax.plot(df.DateTime, df.SoilTemp3, 
+    ax1.plot(df.DateTime, df.SoilTemp3, 
      label = '25cm')
-    ax.plot(df.DateTime, df.SoilTemp4, 
+    ax1.plot(df.DateTime, df.SoilTemp4, 
      label = '35cm')
-    ax.plot(df.DateTime, df.SoilTemp5, 
+    ax1.plot(df.DateTime, df.SoilTemp5, 
      label = '45cm')
-    ax.plot(df.DateTime, df.SoilTemp6, 
+    ax1.plot(df.DateTime, df.SoilTemp6, 
      label = '55cm')
     
-    ax.set_ylabel("Soil Temperature")
+    ax1.set_ylabel("Soil Temperature")
 
     plt.xlabel("Date")
     plt.title(str(df.SensorName[0]))
 
     plt.xlim(min(df.DateTime), max(df.DateTime))
 
-    ax.set_zorder(ax2.get_zorder()+1)
-    ax.patch.set_visible(False)
+    ax1.set_zorder(ax0.get_zorder()+1)
+    ax1.patch.set_visible(False)
 
-    ax.legend()
+    ax1.legend()
 
     #plt.show()
     plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".pdf")
@@ -269,7 +289,19 @@ def snipPrecip(P, fir, la):
     range = pd.date_range(start = fir.date(), end = la.date())
     return P.set_index('Date').reindex(range).rename_axis('Date').reset_index()
    
-
+def snipTemp(met, fir, la):
+    #function trims the precip log to the specified dates, filling in NaNs where there is no available data
+    #P must be a timeseries containing at least two columns, one with dates and one with precip values
+    print(fir)
+    print(la)
+    range = pd.date_range(start = fir, end = la, freq = '30min')
+    return met.set_index('TIMESTAMP').reindex(range).rename_axis('TIMESTAMP').reset_index()
+   
+def clipTo(df, date):
+    #Remove data before a certain date as the sensor is stabilizing
+    #def is a gropoint sensor datafile
+    #date is the date to clip to
+    return df[df.DateTime > pd.to_datetime(date)].reset_index()
 
 #%%
 '''Plots'''
@@ -290,18 +322,21 @@ for file in all_files:
         df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
         #Rounds to the nearest hour
         df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
+
+    #Remove first month of data -- sensor stabilization
+    df = clipTo(df, '2022-12-01')
     
     #Plot soil moisture
-    plotMoisture(df, precip, save_path)
+    plotMoisture(df, precip, S2Fmet, save_path)
 
     #Plot soil temperature
-    plotTemp(df, precip, save_path)
+    plotTemp(df, precip, S2Fmet, save_path)
 
     #plot soil temp heatmap
-    plotTemp_Heatmap(df, save_path)
+    #plotTemp_Heatmap(df, save_path)
 
     #plot soil moist heatmap
-    plotMoisture_Heatmap(df, save_path)
+    #plotMoisture_Heatmap(df, save_path)
     
     file_list.append(df)
     
@@ -309,6 +344,7 @@ for file in all_files:
 sensor_data = pd.concat(file_list, axis = 0, ignore_index = True)
 
 #%%
+'''Plots - Bog'''
 ### Bog sensors
 bog_file_list = []
 for file in bog_files:
@@ -321,6 +357,7 @@ for file in bog_files:
     
     df['SensorName'] = file[file.find('\S')+1:file.find('\S')+5]
     df['SensorDepth_cm'] = file[file.find('\S')+6:file.find('\S')+8]
+
     
     #for i in range(0, len(df['DateTime'])):
     #    #Converts to datetime format
@@ -371,7 +408,7 @@ for site in set(bog_sensor_data.SensorName):
 #%%
 
 '''EXPORT CSV FILE'''
-sensor_data.to_csv(save_path + '01_cleanedsensordata.csv')
+sensor_data.to_csv('./Cleaned Data/01_cleanedsensordata.csv')
     
 
 
