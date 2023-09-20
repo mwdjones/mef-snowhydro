@@ -39,7 +39,7 @@ s6data_df = s6data_df.replace('nan', np.nan)
 s6data_df.time = pd.to_datetime(s6data_df.time)
 s6data_df['watershed'] = 'S6'
 
-allSnow_df = pd.concat([s6data_df, s2data_df])
+allSnow_df = pd.concat([s6data_df, s2data_df]).reset_index()
 
 ### Import Frost Data
 all_frost = pd.read_csv(import_path_raw + 'Snow/mef_snowfrost_data.csv',
@@ -88,6 +88,9 @@ precip = pd.read_csv(import_path_raw + 'GrandRapids_Precip_MNDNR.csv',
 ### Import LAI Data
 s2LAI = pd.read_csv(import_path + "S2_winterLAI_calibrated.csv")
 s6LAI = pd.read_csv(import_path + "S6_winterLAI_calibrated.csv")
+
+### Import Weekly Met Data
+weeklyMet = pd.read_csv(import_path + "/ATM/WeeklyATMSummary.csv")
 
 #%%
 '''FUNCTIONS'''
@@ -768,5 +771,3 @@ ax2.set_xlim(min(soilData_clean.DateTime), max(soilData_clean.DateTime))
 ax2.set_ylim(-3, 14)
 ax2.set_ylabel('Soil Temperature at 5cm depth')
 ax2.set_xlabel('Date')
-
-# %%

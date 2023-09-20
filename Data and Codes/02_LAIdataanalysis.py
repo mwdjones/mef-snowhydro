@@ -59,6 +59,10 @@ s6LAI_grouped = s6LAI_groupednames.merge(s6LAI_groupednums, how = 'outer')
 s2LAI_grouped.Zone =[zone.strip() for zone in s2LAI_grouped.Zone]
 s6LAI_grouped.Zone =[zone.strip() for zone in s6LAI_grouped.Zone]
 
+#Save cleaned files
+s2LAI_grouped.to_csv(filepath_winter + '01_cleanedlaidataS2.csv')
+s6LAI_grouped.to_csv(filepath_winter + '01_cleanedlaidataS6.csv')
+
 #%%
 '''PLOTS ANALYSIS - SUMMER'''
 
@@ -448,7 +452,7 @@ fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
                         layout="constrained")
 
 sns.boxplot(data = pd.concat([s2LAI_winter_grouped, s6LAI_winter_grouped], keys = ['S2', 'S6']).reset_index(),
-    x = 'level_0', y = 'LAI 4Ring',
+    x = 'level_0', y = 'OLS Prediction Ring 5',
     notch=False, showcaps=False,
     flierprops={"marker": "x"},
     #boxprops={"facecolor": (.4, .6, .8, .5)},
