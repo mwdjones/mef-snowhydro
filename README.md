@@ -33,3 +33,4 @@ Tune back in throughout 2023-2025 for more updates as research continues.
 *Citations:*
 - M. W. Jones, X. Feng, K. Hoffman, S. D. Sebestyen, S. Dymond, “Snow, Soil frost, and Hydrologic Connectivity in Peatland Watersheds”, Western Snow Conference 2023, Flagstaff, AZ, April 2023 
 Proceedings in Preparation
+- M. W. Jones, S. D. Sebestyen, S. F. Dymond, G-H. C. Ng, X. Feng, "Frost Decouples Spring Streamflow from Snowmelt in Headwater Catchments", *Journal of Hydrology*, 2023. https://doi.org/10.1016/j.jhydrol.2022.128801
