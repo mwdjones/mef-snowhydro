@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-fig_save = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/Veg/"
-load_path = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/"
+fig_save = "C:/Users/marie/Desktop/mef-snowhydro/Figures/Veg/"
+load_path = "C:/Users/marie/Desktop/mef-snowhydro/Data and Codes/Cleaned Data/"
 ```
 
 ```{r}
@@ -21,15 +21,17 @@ library(tidyverse)
 library(ggpomological)
 library(extrafont)
 library(ggpattern)
+library(ggpmisc)
+library(gridExtra)
 ```
 
 ```{r}
 #Import Data
-forestInvS2 = readxl::read_excel("D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/S2overstory_2023_compiled.xlsx",
+forestInvS2 = readxl::read_excel(paste0(load_path, "S2overstory_2023_compiled.xlsx"),
                                 col_names = TRUE,
                                 col_types = c('text', 'text', 'text', 'numeric', 'numeric', 'numeric', 'numeric', 'text', 'numeric', 'numeric'), 
                                 na = c("NAN", "NA"))
-forestInvS6 = readxl::read_excel("D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/S6overstory_2023_compiled.xlsx",
+forestInvS6 = readxl::read_excel(paste0(load_path, "S6overstory_2023_compiled.xlsx"),
                                 col_names = TRUE,
                                 col_types = c('text', 'text', 'text', 'numeric', 'numeric', 'numeric', 'numeric', 'text', 'numeric', 'numeric'), 
                                 na = c("NAN", "NA"))
@@ -46,6 +48,8 @@ head(forestInv)
  ```{r}
  unique(forestInv$SPECIES)
  ```
+
+## Data formatting and biomass calculations
 
  ```{r, echo = FALSE}
  #Sort into peatland zones
@@ -67,12 +71,55 @@ head(forestInv)
    mutate(basalArea_m2 = (3.1415 * (DBH_CM/2)^2)/1000)
  ```
 
+ ```{r}
+ #Assign species groupd
+ # Hardwood: Aspen/Alder (HA), Soft Maple/Birch (HB), Mixed (HM), Hard Maple/Oak (HO)
+ # Softwood: Cedar/Larch (SC), Douglas Fir (SD), True Fir/Hemlock (SF), Pine (SP), Spruce (SS)
+
+ forestInv = forestInv  %>% 
+  mutate(GROUP = 
+    ifelse(SPECIES %in% c('Populus balsamifera', 'Populus grandidentata', 'Populus tremuloides'), 'HA', 
+    ifelse(SPECIES %in% c('Acer rubrum', 'Betula papyrifera'), 'HB', 
+    ifelse(SPECIES %in% c('Fraxinus americana', 'Tilia americana', 'Ulmus americana'), 'HM', 
+    ifelse(SPECIES %in% c(
+      'Acer saccharum', 'Quercus rubra'), 'HO', 
+    ifelse(SPECIES %in% c('Larix laricina'), 'SC',
+    ifelse(SPECIES %in% c('Abies balsamea'), 'SF', 
+    ifelse(SPECIES %in% c('Pinus resinosa', 'Pinus strobus'), 'SP', 
+    ifelse(SPECIES %in% c('Picea glauca', 'Picea mariana'), 'SS', 'NA')))))))))
+ ```
+
+
+ ```{r}
+ #Calculate Tree Height
+ forestInv = forestInv %>%
+  mutate(HEIGHT = 2.03*(DBH_CM^0.71))
+
+ ```
+
+  ```{r}
+ #Calculate Above Ground Biomass
+ forestInv = forestInv %>%
+  mutate(BIOMASS = 
+    ifelse(GROUP == 'HA', exp(-2.2094 + 2.3867*log(DBH_CM)), 
+    ifelse(GROUP == 'HB', exp(-1.9123 + 2.3651*log(DBH_CM)), 
+    ifelse(GROUP == 'HM', exp(-2.4800 + 2.4835*log(DBH_CM)), 
+    ifelse(GROUP == 'HO', exp(-2.0127 + 2.4342*log(DBH_CM)), 
+    ifelse(GROUP == 'SC', exp(-2.0336 + 2.2592*log(DBH_CM)), 
+    ifelse(GROUP == 'SF', exp(-2.5384 + 2.4814*log(DBH_CM)), 
+    ifelse(GROUP == 'SP', exp(-2.5356 + 2.4349*log(DBH_CM)), 
+    ifelse(GROUP == 'SS', exp(-2.0773 + 2.3323*log(DBH_CM)), NaN)))))))))
+
+ ```
+
  ```{r, echo = FALSE}
  head(forestInv)
  ```
 
+### Basic Plotting
+
  ```{r}
- #Species distribution plot
+ #Species counts plot
  ggplot(data = forestInv, aes(x = SPECIES, fill = Zone)) +
    geom_histogram(stat = "count", position = "stack") +
    guides(x =  guide_axis(angle = -45)) +
@@ -90,14 +137,40 @@ head(forestInv)
   ggsave(paste0(fig_save, "speciesDistribution.png"), width = 10, height = 4)
  ```
 
+   ```{r, echo = FALSE}
+ #Group the data by species and watershed - sum biomass
+ forestInv_totBIO = forestInv %>%
+  group_by(SITE, SPECIES, WATERSHED, CC, Zone) %>% 
+  summarise(TOTAL = sum(BIOMASS))
+ ```
+
  ```{r}
+ #Species biomass plot
+ ggplot(data = forestInv_totBIO, aes(x = SPECIES, y = TOTAL, fill = Zone)) +
+   geom_col(position = 'stack') +
+   guides(x =  guide_axis(angle = -45)) +
+   facet_grid(cols = vars(WATERSHED), labeller = label_both) +
+   scale_fill_pomological() +
+   labs(x = " ", y = "Total Above Ground Biomass [kg/plot]",
+        title = "Biomass Distribution by Peatland Zone", 
+        subtitle = "Highest diversity and abundance in the uplands with small Black Spruce dominating the bog.") +
+   theme(#strip.background = element_blank(),
+         #strip.text = element_blank(), 
+         panel.background = element_blank(), 
+         panel.grid = element_line(colour = 'grey92'),
+         plot.title=element_text(face="bold", size=20) 
+         ) 
+  ggsave(paste0(fig_save, "biomassDistribution.png"), width = 10, height = 4)
+ ```
+
+```{r}
  # Canopy Class Distribution
- ggplot(data = na.omit(forestInv), aes(x = DBH_CM, fill = Conif)) +
-   geom_histogram() +
+ ggplot(data = forestInv_totBIO, aes(x = TOTAL, fill = WATERSHED)) +
+   geom_histogram() + 
    facet_grid(cols = vars(Zone),
               rows = vars(factor(CC, levels = c("Dom", "Co", "Int", "Sup")))) +
-   labs(x = "Diameter at Breast Height [cm]", y = "Counts",
-        title = "Tree Width by Peatland Zone", 
+   labs(x = "Total Above Ground Biomass [kg/plot]", y = "Counts",
+        title = "Tree Biomass by Peatland Zone", 
         subtitle = "High number of small trees in bog versus fewer but more variable tree widths in uplands.") +
    scale_fill_manual(values = c("#234d20", "#77ab59")) +
    theme(strip.background = element_blank(),
@@ -105,16 +178,15 @@ head(forestInv)
          panel.grid = element_line(colour = 'grey92'),
          plot.title=element_text(face="bold", size=20) 
          ) 
- ggsave(paste0(fig_save, "canopyClassDistribution.png"), width = 5, height = 5)
+ ggsave(paste0(fig_save, "canopyClassDistribution.png"), width = 7, height = 5)
  ```
 
- ```{r, echo = FALSE}
+```{r, echo = FALSE}
  #Summarize the data by species and locations
  forestInv_sum = forestInv %>%
    count(NORTHING, EASTING, SPECIES, sort = TRUE)
  head(forestInv_sum)
  ```
-
 
  ```{r}
  #Species abundance
@@ -175,20 +247,20 @@ forestInvS6 = forestInv %>%
   #Calculate and add StDev to each plot
  forestInvS2 = forestInvS2 %>% 
     group_by(eastingBin, northingBin) %>% 
-    mutate(DBH_CM_SD = sd(DBH_CM, na.rm=FALSE)) %>%
+    mutate(BA_SD = sd(basalArea_m2, na.rm=FALSE)) %>%
     ungroup()
 
  #DBH distribution - S2
- ggplot(data = forestInvS2, aes(x = DBH_CM, color = Zone, fill = Zone)) +
-   geom_density() + 
+ ggplot(data = forestInvS2, aes(x = basalArea_m2, color = Zone, fill = Zone)) +
+   geom_histogram() + 
    facet_grid(rows = vars(eastingBin_f), cols = vars(northingBin)) + 
    scale_color_pomological() +
    scale_fill_pomological() +
-   xlim(0, 65) + 
-   geom_text(mapping = aes(label = round(DBH_CM_SD, 2), x = 50, y = 0.15), size = 5) +
-   labs(x = "Diameter at Breast Height (cm)", 
+   xlim(0, 3) + 
+   geom_text(mapping = aes(label = paste0('SD = ', round(BA_SD, 2)), x = 1.5, y = 10), size = 5) +
+   labs(x = "Basal Area (m^2)", 
         y = "Frequency",
-        title = "Diameter at Breast Height Distributions in S2", 
+        title = "Basal Area Distributions in S2", 
         subtitle = "Diversity of tree width is higher in the upland regions than in the bog.") +
    theme(strip.background = element_blank(),
          strip.text = element_blank(), 
@@ -197,28 +269,29 @@ forestInvS6 = forestInv %>%
          plot.title=element_text(face="bold", size=20)
          ) 
 
- ggsave(paste0(fig_save, "S2DBHDistribution.png"), width = 10, height = 7)
+ ggsave(paste0(fig_save, "S2BADistribution.png"), width = 10, height = 7)
 ```
 
+
 ```{r}
-  #Calculate and add StDev to each plot
+   #Calculate and add StDev to each plot
  forestInvS6 = forestInvS6 %>% 
     group_by(eastingBin, northingBin) %>% 
-    mutate(DBH_CM_SD = sd(DBH_CM, na.rm=FALSE)) %>%
+    mutate(BA_SD = sd(basalArea_m2, na.rm=FALSE)) %>%
     ungroup()
 
  #DBH distribution - S6
- ggplot(data = forestInvS6, aes(x = DBH_CM, color = Zone, fill = Zone)) +
-   geom_density() + 
+ ggplot(data = forestInvS6, aes(x = basalArea_m2, color = Zone, fill = Zone)) +
+   geom_histogram() + 
    facet_grid(rows = vars(eastingBin_f), cols = vars(northingBin)) + 
    scale_color_pomological() +
    scale_fill_pomological() +
-   xlim(0, 65) + 
-   geom_text(mapping = aes(label = round(DBH_CM_SD, 2), x = 50, y = 0.15), size = 5) +
-   labs(x = "Diameter at Breast Height (cm)", 
+   xlim(0, 3) + 
+   geom_text(mapping = aes(label = paste0('SD = ', round(BA_SD, 2)), x = 1.5, y = 10), size = 5) +
+   labs(x = "Basal Area (m^2)", 
         y = "Frequency",
-        title = "Diameter at Breast Height Distributions in S6", 
-        subtitle = "Diversity of tree width is even across all regions.") +
+        title = "Basal Area Distributions in S6", 
+        subtitle = "Diversity of tree width variation between upland and bog is less clear than S2.") +
    theme(strip.background = element_blank(),
          strip.text = element_blank(), 
          panel.background = element_blank(), 
@@ -226,7 +299,34 @@ forestInvS6 = forestInv %>%
          plot.title=element_text(face="bold", size=20)
          ) 
 
- ggsave(paste0(fig_save, "S6DBHDistribution.png"), width = 10, height = 7)
+
+ ggsave(paste0(fig_save, "S6BADistribution.png"), width = 10, height = 7)
+```
+
+
+```{r}
+'''Boxplot of total plot BA by Zone/Watershed'
+#Group the data by species and watershed - sum biomass
+ forestInv_totBA = forestInv %>%
+  group_by(SITE, WATERSHED, Zone) %>% 
+  summarise(TOTAL_BA = sum(basalArea_m2))
+
+ggplot(data = forestInv_totBA, aes(x = WATERSHED, y = TOTAL_BA, color = Zone, fill = Zone)) +
+   geom_boxplot() + 
+   scale_color_pomological() +
+   scale_fill_pomological() +
+   labs(y = "Basal Area (m2/plot)",
+        title = "Basal Area by Zone in S2/S6", 
+        subtitle = "S6 uplands and lagg show no plots with small basal area, distinguishing the uplands from the bog.") +
+   theme(strip.background = element_blank(),
+         strip.text = element_blank(), 
+         panel.background = element_blank(), 
+         panel.grid = element_line(colour = 'grey92'),
+         plot.title=element_text(face="bold", size=20)
+         ) 
+
+
+ ggsave(paste0(fig_save, "BABoxplot.png"), width = 8, height = 6)
 ```
 
 ```{r, echo = FALSE}
@@ -279,9 +379,7 @@ forestInvS6 = forestInv %>%
  ggsave(paste0(fig_save, "S6SpeciesDistribution.png"), width = 10, height = 7)
  ```
 
-# Calculate Diversity Index
-
-# ## Forest Canopy and Snow Data relationships 
+## Forest Canopy and Snow Data relationships 
 
 ```{r}
  ## Import melted csv with snow data
@@ -300,6 +398,10 @@ forestInvS6 = forestInv %>%
  snow_avg = snow %>% 
    group_by(stakes) %>%
    summarise(avg_depths = mean(depths))
+
+ snow_max = snow %>% 
+   group_by(stakes) %>%
+   summarise(max_depths = max(depths))
  ```
 
 
@@ -313,6 +415,10 @@ forestInvS6 = forestInv %>%
  forestInv_basal = forestInv %>%
    group_by(SITE) %>%
    summarise(across(starts_with('basal'), sum))
+
+ forestInv_bio = forestInv %>%
+   group_by(SITE) %>%
+   summarise(across(starts_with('BIO'), sum))
 
  forestInv_counts = forestInv %>%
    count(SITE, sort = TRUE)
@@ -337,6 +443,7 @@ forestInvS6 = forestInv %>%
  #Merge forest data together
  merged_forest = merge(forestInv_avg, forestInv_counts, by = "SITE")
  merged_forest = merge(merged_forest, forestInv_basal, by = "SITE")
+ merged_forest = merge(merged_forest, forestInv_bio, by = "SITE")
  merged_forest = merge(merged_forest, forestInv_cc, by = "SITE")
  merged_forest = merge(merged_forest, forestInv_prop[c("SITE", "prop_Deciduous", "prop_Coniferous")], by = "SITE")
  merged_forest = merge(merged_forest, forestInv_watershed, by = "SITE")
@@ -349,18 +456,23 @@ forestInvS6 = forestInv %>%
  ```{r, echo = FALSE}
  #Merge forest data with snow data
  merged_data = merge(merged_forest, snow_avg, by.x = 'SITE', by.y = 'stakes')
+ merged_data = merge(merged_data, snow_max, by.x = 'SITE', by.y = 'stakes')
  head(merged_data)
  ```
 
  ```{r}
  #Snow Depth and Basal Area
- ggplot(data = merged_data, aes(x = basalArea_m2, y = avg_depths, color = prop_Deciduous)) + 
+ ggplot(data = merged_data, aes(x = basalArea_m2, y = max_depths,
+  color = prop_Deciduous)) + 
+   stat_poly_line(color = 'black', fullrange = TRUE) +
    geom_point(size = 4) + 
+   stat_poly_eq(use_label(c("R2", "p", "n")), label.x = 'right', label.y = 'top') +
    facet_grid(cols = vars(WATERSHED)) + 
-   labs(x = "Basal Area (m2)", 
-        y = "Average winter snow depth (m)",
+   labs(x = "Basal Area (m2/plot)", 
+        y = "Maximum winter snow depth (cm)",
         title = "Snow Depth Based on Forest Parameters", 
-        subtitle = " ") +
+        subtitle = "S6 shows lower snow depths in dense coniferous stands.") +
+   scale_color_gradient(low="#234d20", high="#77ab59", name = 'Deciduous Ratio') +
    theme(#strip.background = element_blank(),
          #strip.text = element_blank(), 
          panel.background = element_blank(), 
@@ -369,6 +481,9 @@ forestInvS6 = forestInv %>%
          ) 
  ggsave(paste0(fig_save, "snowBasalArea.png"), width = 10, height = 4)
  ```
+
+
+## LAI and Veg Data comparison
 
 ```{r}
 #Import LAI
@@ -389,21 +504,58 @@ head(allData)
 ```
 
 ```{r}
-ggplot(data = allData, aes(x = OLS.Prediction.Ring.5, y = avg_depths, color = prop_Deciduous)) + 
+ggplot(data = allData, aes(x = OLS.Prediction.Ring.5, y = max_depths,
+  color = prop_Deciduous)) + 
+   stat_poly_line(color = 'black', fullrange = TRUE) +
+   geom_point(size = 4) + 
+   stat_poly_eq(use_label(c("R2", "p", "n")), label.x = 'right', label.y = 'top') +
+   facet_grid(cols = vars(WATERSHED)) + 
+   labs(x = "Leaf Area Index", 
+        y = "Maximum winter snow depth (cm)",
+        title = "Snow Depth Based on LAI", 
+        subtitle = "Neither watershed shows significant relationships between winter LAI and max snow depth.") +
+   scale_color_gradient(low="#234d20", high="#77ab59", name = 'Deciduous Ratio') +
+   theme(#strip.background = element_blank(),
+         #strip.text = element_blank(), 
+         panel.background = element_blank(), 
+         panel.grid = element_line(colour = 'grey92'), 
+         plot.title=element_text(face="bold", size=20)
+         ) 
+ ggsave(paste0(fig_save, "snowLAI.png"), width = 10, height = 4)
+```
+
+
+```{r}
+#LAI vs biomass and basal area
+
+basal <- ggplot(data = allData, aes(x = OLS.Prediction.Ring.5, y = basalArea_m2, color = prop_Deciduous)) +
   geom_point(size = 4) + 
-  facet_grid(cols = vars(WATERSHED)) + 
-  labs(x = "Ring 5 Winter LAI", 
-       y = "Average winter snow depth (m)",
-       title = "Snow predictions from LAI only",
-       subtitle = " ") +
+  labs(x = "Leaf Area Index", 
+        y = "Basal Area (m2/plot)") + 
+  scale_color_gradient(low="#234d20", high="#77ab59", name = 'Deciduous Ratio') +
   theme(#strip.background = element_blank(),
         #strip.text = element_blank(), 
         panel.background = element_blank(), 
         panel.grid = element_line(colour = 'grey92'), 
-        plot.title=element_text(face="bold", size=20)
-        ) 
- ggsave(paste0(fig_save, "snowLAI.png"), width = 10, height = 4)
+        plot.title=element_text(face="bold", size=20), 
+        legend.position='none'
+        )
+
+bio <- ggplot(data = allData, aes(x = OLS.Prediction.Ring.5, y = BIOMASS, color = prop_Deciduous)) +
+  geom_point(size = 4) + 
+  labs(x = "Leaf Area Index", 
+        y = "Total Above Ground Biomass (kg/plot)") + 
+  scale_color_gradient(low="#234d20", high="#77ab59", name = 'Deciduous Ratio') +
+  theme(#strip.background = element_blank(),
+        #strip.text = element_blank(), 
+        panel.background = element_blank(), 
+        panel.grid = element_line(colour = 'grey92'), 
+        plot.title=element_text(face="bold", size=20))
+
+g = arrangeGrob(basal, bio, nrow = 1, ncol = 2)
+ggsave(paste0(fig_save, "LAIVegComparison.png"), g, width = 10, height = 4)
 ```
+
 
 
 # Principle Component Analysis?
