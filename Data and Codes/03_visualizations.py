@@ -136,9 +136,9 @@ save_path = "../Figures/"
 
 #Plotting Specifics
 custom_col = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
-custom_pal = {'Upland': '#1b9e77', 
+custom_pal = {'Upland': '#7570b3', 
               'Lagg': '#d95f02', 
-              'Bog': '#7570b3'}
+              'Bog': '#1b9e77'}
 
 #%%
 '''SNOW TIMESERIES AND KDE PLOTS'''

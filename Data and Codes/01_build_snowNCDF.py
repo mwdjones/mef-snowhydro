@@ -3,6 +3,9 @@
 import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+import seaborn as sns
+import pandas as pd
 
 #%%
 
@@ -309,7 +312,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = '../Figures/snowPlots/'
+save_path = 'C:/Users/marie/Desktop/mef-snowhydro/Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
@@ -333,6 +336,7 @@ snow_s2.depths.plot.contourf(col = 'time', col_wrap = 3)
 plt.savefig(save_path + "S2_snowdepths_time.pdf")
 plt.savefig(save_path + "S2_snowdepths_time.jpg")
 plt.show()
+
 
 #%%
 '''SAVE DATA'''
