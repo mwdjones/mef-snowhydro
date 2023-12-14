@@ -444,9 +444,9 @@ print(s6bog_ANOVA)
 # %%
 #Plotting Specifics
 custom_col = sns.color_palette(['#1b9e77', '#d95f02', '#7570b3'])
-custom_pal = {'Upland': '#1b9e77', 
+custom_pal = {'Upland': '#7570b3', 
               'Lagg': '#d95f02', 
-              'Bog': '#7570b3'}
+              'Bog': '#1b9e77'}
 
 fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(5.5, 3.5),
                         layout="constrained")
@@ -473,7 +473,9 @@ ax.text(1.27, 3.0, 'B', fontweight = 'bold', horizontalalignment = 'center')
 ax.set_ylabel('LAI Ring 5')
 ax.set_xlabel('Watershed')
 ax.set_ylim(0, 3.5)
-ax.legend(bbox_to_anchor = (1.3, 1))
+plt.legend([],[], frameon=False)
+
+plt.savefig(save_path + 'winterLAIcomp.svg')
 
 
 

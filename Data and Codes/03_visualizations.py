@@ -179,7 +179,7 @@ sns.boxplot(data = s2data_df,
 ax1.set_xlabel(' ')
 ax1.set_ylabel('Snow depths [cm]')
 ax1.set_ylim(0, 90)
-ax1.legend(bbox_to_anchor = (-0.25, 1))
+ax1.legend([],[], frameon=False)
 
 #time series
 ax2 = fig.add_subplot(gs[0, 1:3])
@@ -255,6 +255,7 @@ plt.xticks(rotation=30)
 #plt.suptitle('Snow Depths in S2 (top) and S6 (bottom)')
 plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.pdf')
 plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.jpg')
+plt.savefig(save_path + 'snowPlots/' + 's2_and_s6_kde_timeseries.svg')
 plt.show()
 
 #%%
@@ -554,6 +555,9 @@ ax2.set_xlabel('Time')
 ax2.set_ylabel('S6')
 ax2.set_xticklabels(x_ticks)
 plt.xticks(rotation=30)
+
+plt.savefig(save_path + 'laiPlots/' + 'coorPlotsHeatmap.svg')
+plt.show()
 
 #%%
 '''FROST DEPTHS'''

@@ -503,6 +503,12 @@ allData = merge(lai, merged_data, by.x = "Stake_ID", by.y = "SITE")
 head(allData)
 ```
 
+
+```{r}
+write_csv(allData, "./Data and Codes/Cleaned Data/VegData_LAI_Snow.csv")
+```
+
+
 ```{r}
 ggplot(data = allData, aes(x = OLS.Prediction.Ring.5, y = max_depths,
   color = prop_Deciduous)) + 
