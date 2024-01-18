@@ -121,26 +121,6 @@ aov.p = aov(Y ~ (factor(watershed)*factor(time))+Error(factor(stakes)), bog)
 summary(aov.p)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 ### Import LAI data 
 s2lai = read.csv("D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/S2_winterLAI_calibrated.csv", 
