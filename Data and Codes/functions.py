@@ -14,6 +14,29 @@ import datetime as dt
 from scipy.signal import find_peaks
 from scipy.stats import kendalltau
 
+def findFirstNonZero(list):
+    for index, value in enumerate(list):
+        if(value > 0):
+                return value
+        else:
+            continue    
+    return np.nan
+
+def findFirstNonZero_Reverse(list):
+    for index, value in reversed(enumerate(list)):
+        if(value > 0):
+                return value
+        else:
+            continue    
+    return np.nan
+
+def round_sig(x, sig=2):
+    return round(x, sig-int(floor(log10(abs(x))))-1)
+
+
+def jitter(values, j):
+    return values + np.random.normal(j, 0.1, values.shape)
+
 def positive_cumsum(x):
     y = np.zeros(len(x))
 

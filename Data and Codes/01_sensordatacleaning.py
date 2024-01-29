@@ -27,14 +27,14 @@ import datetime
 
 '''PROBE DATA IMPORT'''
 #Soil Data from Gropoint sensors
-directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/GroPoint/'
-save_path = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Figures/soilPlots/'
-import_path_frost = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
+directory = './Raw Data/GroPoint/'
+save_path = '../Figures/soilPlots/'
+import_path_frost = "./Raw Data/"
 all_files = glob.glob(os.path.join(directory, 'S*.txt'))
 bog_files = glob.glob(os.path.join(directory, 'S*.csv'))
 
 #Precipitation data - update from MN DNR site occasionally, eventually replace with MEF data
-precip_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/'
+precip_directory = './Raw Data/'
 precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv', 
                      na_values = ['T', 'M'], 
                      parse_dates = ['Date'], 
@@ -76,7 +76,7 @@ for idx,row in frost.iterrows():
 dt_format = "%Y-%m-%d %H:%M"
 
 #Import S2 Forest Met Station Data
-met_directory = 'D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Cleaned Data/ATM/'
+met_directory = './Cleaned Data/ATM/'
 S2Fmet = pd.read_csv(met_directory + '01_CleanedS2F.csv', 
                     parse_dates = ['TIMESTAMP'])
 
