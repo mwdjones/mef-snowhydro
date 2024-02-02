@@ -14,6 +14,8 @@ import datetime as dt
 from scipy.signal import find_peaks
 from scipy.stats import kendalltau
 
+from math import floor, log10
+
 def findFirstNonZero(list):
     for index, value in enumerate(list):
         if(value > 0):
