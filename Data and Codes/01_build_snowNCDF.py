@@ -106,7 +106,31 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [0, 0, 0, 0, 0, 0],
             [np.nan, 0, 0, 0, 0, 0],
             [np.nan, np.nan, 0, 0, 0, 0],
-            [np.nan, np.nan, np.nan, 0, 0, 0]]]
+            [np.nan, np.nan, np.nan, 0, 0, 0]], 
+            [[np.nan, 0, 0, np.nan, np.nan, np.nan],
+            [0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0],
+            [np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0]], 
+            [[np.nan, 9, 11, np.nan, np.nan, np.nan],
+            [9, 12, 9, 10, 9, np.nan],
+            [9, 10, 14, 9, 7, 8],
+            [np.nan, 10, 10, 15, 7, 7],
+            [np.nan, np.nan, 7, 9, np.nan, 7],
+            [np.nan, np.nan, np.nan, 6, 7, 3]], 
+            [[np.nan, 6, 7, np.nan, np.nan, np.nan],
+            [4, 5, 6, 6, 6, np.nan],
+            [3, 8, 9, 4, 4, 4],
+            [np.nan, 6, 8, 7, 1, 4],
+            [np.nan, np.nan, 3, 7, 9, 2],
+            [np.nan, np.nan, np.nan, 2, 4, 1]], 
+            [[np.nan, 0.5, 0.5, np.nan, np.nan, np.nan],
+            [0.5, 0.5, 0.5, 0.5, 0.5, np.nan],
+            [0.5, 0.5, 2, 0.5, 0.5, 0.5],
+            [np.nan, 0.5, 0.5, 1, 0.5, 0.5],
+            [np.nan, np.nan, 0.5, 0.5, 0.5, 0.5],
+            [np.nan, np.nan, np.nan, 0.5, 0.5, 0.5]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, 13, 11, np.nan], # S214 interpolated (13)
@@ -203,7 +227,31 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [0, 0, 0, 0, 0, 0, 0],
             [np.nan, np.nan, 0, 0, 0, 0, 0],
             [np.nan, np.nan, np.nan, 0, 0, 0, 0],
-            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]], 
+            [[0, 0, 0, 0, 0, 0, np.nan],
+            [np.nan, 0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]], 
+            [[11, 10, 13, 8, 6, 10, np.nan],
+            [np.nan, 11, 5, 17, 11, 11, np.nan],
+            [11, 8, 9, 14, 12, 12, 11],
+            [np.nan, np.nan, 11, 11, 11, 13, 15],
+            [np.nan, np.nan, np.nan, 11, 10, 12, 11],
+            [np.nan, np.nan, np.nan, np.nan, 12, 11, np.nan]], 
+            [[8, 7, 8, 5, 3, 9, np.nan],
+            [np.nan, 9, 5, 7, 8, 6, np.nan],
+            [7, 5, 10, 6, 7, 9, 8],
+            [np.nan, np.nan, 8, 6, 8, 10, 9],
+            [np.nan, np.nan, np.nan, 8, 9, 8, 6],
+            [np.nan, np.nan, np.nan, np.nan, 9, 8, np.nan]], 
+            [[1, 0.5, 0.5, 0.5, 0.5, 0.5, np.nan], # <1 cm amounts were entered as 0.5
+            [np.nan, 2, 0.5, 2, 0.5, 0.5, np.nan],
+            [0.5, 0.5, 2, 3, 0.5, 4, 0.5],
+            [np.nan, np.nan, 1, 1, 6.5, 3, 2],
+            [np.nan, np.nan, np.nan, 1, 1, 0.5, 0.5],
+            [np.nan, np.nan, np.nan, np.nan, 1, 0.5, np.nan]]]
 
 '''Times'''
 #Add dates as needed
@@ -211,7 +259,8 @@ times = np.array(['12-02-2022', '12-30-2022',
  '01-05-2023', '01-13-2023', '01-20-2023',
  '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
  '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
- '04-14-2023', '04-28-2023', '05-05-2023'])
+ '04-14-2023', '04-28-2023', '05-05-2023', '12-01-2023',
+ '01-22-2024', '01-31-2024', '02-01-2024'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
@@ -312,7 +361,7 @@ snow_s2 = xr.Dataset(
 
 #%%
 '''Plotting'''
-save_path = 'C:/Users/marie/Desktop/mef-snowhydro/Figures/snowPlots/'
+save_path = '../Figures/snowPlots/'
 
 #Individual depth plots at each time
 for t in times:
