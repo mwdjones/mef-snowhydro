@@ -23,6 +23,9 @@ import os
 #For datetime 
 import datetime
 
+'''Patch Data'''
+from breakpts import moistpt_dict
+
 #%%
 
 '''PROBE DATA IMPORT'''
@@ -42,43 +45,13 @@ precip = pd.read_csv(precip_directory + 'GrandRapids_Precip_MNDNR.csv',
                      header = 0, 
                      dtype = {'P_in':float, 'Snow_in':float, 'SnowDepth_in':float})
 
-#Frost Data from Anne
-all_frost = pd.read_csv(import_path_frost + 'Snow/mef_snowfrost_data.csv',
-    parse_dates = ['DATE'], 
-    na_values = ['NaN'])
-
-#Format Data
-all_frost = all_frost[1:]
-frost = all_frost.dropna(subset = ['FROST'])
-frost = frost.replace('2023-02-01', '2023-01-30')
-frost = frost[['STAKE NO', 'DATE', 'FROST.1']]
-frost['STAKE NO'] =[col.strip() for col in frost['STAKE NO']]
-frost['FROST.1'] =[np.float64(c) for c in frost['FROST.1']]
-frost['Zones'] = np.arange(0, len(frost.DATE))
-frost['Watershed'] = np.arange(0, len(frost.DATE))
-
-#Sort Stake Names
-for idx,row in frost.iterrows():
-    stake = row[0]
-
-    if stake.startswith('S6'):
-        frost.Watershed[idx] = 'S6'
-    else:
-        frost.Watershed[idx] = 'S2'
-        
-    if stake in ['S603', 'S632', 'S04', 'S05', 'S15', 'S44', 'S54']:
-        frost.Zones[idx] = 'Upland'
-    elif stake in ['S613', 'S622', 'S25']:
-        frost.Zones[idx] = 'Lagg'
-    else:
-        frost.Zones[idx] = 'Bog'
-#For timestamp rounding 
-dt_format = "%Y-%m-%d %H:%M"
-
 #Import S2 Forest Met Station Data
 met_directory = './Cleaned Data/ATM/'
 S2Fmet = pd.read_csv(met_directory + '01_CleanedS2F.csv', 
                     parse_dates = ['TIMESTAMP'])
+
+#For timestamp rounding
+dt_format = "%Y-%m-%d %H:%M"
 
 #%%
 '''FUNCTIONS'''
@@ -95,11 +68,9 @@ def roundTime(dt=None, roundTo=60):
    return dt + datetime.timedelta(0,rounding-seconds,-dt.microsecond)
 
 def plotMoisture(df, P, met, save_path):
-    fig, [ax0, ax1] = plt.subplots(2, 1, 
-                        figsize=(6, 4),
-                        sharex=True,
+    fig, ax1 = plt.subplots(1, 1, 
+                        figsize=(6, 3),
                         layout="constrained")
-    
     
     #Soil Moisture
     ax1.plot(df.DateTime, df.SoilMoist_15cm, '-r',
@@ -108,22 +79,12 @@ def plotMoisture(df, P, met, save_path):
      label = '30cm')
     ax1.plot(df.DateTime, df.SoilMoist_45cm, '-g',
      label = '45cm')
-    
-    ax1.set_ylabel("Soil Moisture")
+    ax1.set_ylabel("Soil Moisture, VMC [cm3/cm3]")
 
-    #Precip
-    ax00 = ax0.twinx()
-    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
-    ax00.bar(Psnip.Date, Psnip.P_in, color = 'lightblue', zorder = -2)
-
-    ax00.set_ylabel("Precipitation [in]")
-
-    #Air Temp
-    #Tsnip = snipTemp(met, min(df.DateTime), max(df.DateTime))
-    ax0.plot(met.TIMESTAMP, met.Air_TempC_Avg, color = 'orangered', alpha = 0.5, zorder = -1)
-    roll = met["Air_TempC_Avg"].rolling(672).mean()
-    ax0.plot(met.TIMESTAMP, roll, linewidth = 1, color = 'orangered')
-    ax0.set_ylabel("Air Temperature [C]")
+    ax12 = ax1.twinx()
+    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime)) 
+    ax12.bar(Psnip.Date, Psnip.P_in, color = 'silver', zorder = -2)  
+    ax12.set_ylabel("S2 Forest Precipition [in]")  
 
     plt.xlabel("Date")
     plt.title(str(df.SensorName[0]))
@@ -139,24 +100,11 @@ def plotMoisture(df, P, met, save_path):
     plt.show()
 
 def plotTemp(df, P, met, save_path):
-    fig, [ax0, ax1] = plt.subplots(2, 1, 
-                        figsize=(6, 4),
+    fig, ax1 = plt.subplots(1, 1, 
+                        figsize=(6, 3),
                         sharex=True,
                         layout="constrained")
     
-    #Precip
-    ax00 = ax0.twinx()
-    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime))
-    ax00.bar(Psnip.Date, Psnip.P_in, color = 'lightblue', zorder = -2)
-
-    ax00.set_ylabel("Precipitation [in]")
-
-    #Air Temp
-    #Tsnip = snipTemp(met, min(df.DateTime), max(df.DateTime))
-    ax0.plot(met.TIMESTAMP, met.Air_TempC_Avg, color = 'orangered', alpha = 0.5, zorder = -1)
-    roll = met["Air_TempC_Avg"].rolling(672).mean()
-    ax0.plot(met.TIMESTAMP, roll, linewidth = 1, color = 'orangered')
-    ax0.set_ylabel("Air Temperature [C]")
 
     #Soil Temperature
     ax1.plot(df.DateTime, df.SoilTemp1,
@@ -171,15 +119,18 @@ def plotTemp(df, P, met, save_path):
      label = '45cm')
     ax1.plot(df.DateTime, df.SoilTemp6, 
      label = '55cm')
-    
     ax1.set_ylabel("Soil Temperature")
+
+    ax12 = ax1.twinx()
+    Psnip = snipPrecip(P, min(df.DateTime), max(df.DateTime)) 
+    ax12.bar(Psnip.Date, Psnip.P_in, color = 'silver', zorder = -2)  
+    ax12.set_ylabel("S2 Forest Precipition [in]")  
 
     plt.xlabel("Date")
     plt.title(str(df.SensorName[0]))
 
     plt.xlim(min(df.DateTime), max(df.DateTime))
 
-    ax1.set_zorder(ax0.get_zorder()+1)
     ax1.patch.set_visible(False)
 
     ax1.legend()
@@ -189,99 +140,6 @@ def plotTemp(df, P, met, save_path):
     plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".jpg")
 
     plt.show()
-
-def plotTemp_Heatmap(df, save_path):
-    #Aggregate to daily - makes contour smoother
-    df['DateTime'] = df['DateTime'].astype('datetime64[ns]')
-    df2 = df.resample('D', on = 'DateTime').mean().reset_index()
-
-    #select soil temp data
-    data = df2.filter(regex = r'SoilTemp')
-
-    #dates 
-    dates = df2.DateTime
-
-    #depths 
-    depths = np.array([5, 15, 25, 35, 45, 55]) #depths in centimeters
-
-    #levels
-    levels = np.arange(-2, 14, 2)
-
-    #plot heatmap
-    fig, ax = plt.subplots(figsize = (8, 4),
-                           layout = 'constrained')
-    
-    cset1 = ax.contourf(dates, depths, data.T, 
-                    levels = levels,
-                    cmap = 'coolwarm')
-    cset2 = ax.contour(dates, depths, data.T, 
-                    levels = cset1.levels,
-                    colors = 'black')
-    
-    #frost contour line
-    cset3 = ax.contour(dates, depths, data.T, 
-                       levels = (0,), 
-                       colors = 'red', 
-                       linewidth = 2)
-    
-    #Add manual data
-    #Match sensor name
-    frostTemp = all_frost[(all_frost['STAKE NO'].str.contains(df.SensorName[0][-2:])) & (all_frost['FROST.1'] >= 5)]
- 
-    #Plots
-    ax.scatter(frostTemp['DATE'], frostTemp['FROST.1'], 
-            marker = 'X', 
-            edgecolors = 'black', 
-            facecolor = 'white')
-    
-    ax.invert_yaxis()
-    fig.colorbar(cset1, ax = ax, label = 'Soil Temperature [degC]')
-    plt.title(str(df.SensorName[0]))
-
-
-    plt.savefig(save_path + "tempfig_heatmap" + str(df.SensorName[0]) + ".pdf")
-    plt.savefig(save_path + "tempfig" + str(df.SensorName[0]) + ".jpg")
-
-    plt.show()
-
-def plotMoisture_Heatmap(df, save_path):
-    #Aggregate to daily - makes contour smoother
-    df['DateTime'] = df['DateTime'].astype('datetime64[ns]')
-    df2 = df.resample('D', on = 'DateTime').mean().reset_index()
-
-    #select soil temp data
-    data = df2.filter(regex = r'SoilMoist')
-
-    #dates 
-    dates = df2.DateTime
-
-    #depths 
-    depths = np.array([15, 30, 45]) #depths in centimeters
-
-    #levels
-    levels = np.arange(0, 40, 5)
-
-    #plot heatmap
-    fig, ax = plt.subplots(figsize = (8, 4),
-                           layout = 'constrained')
-    
-    cset1 = ax.contourf(dates, depths, data.T, 
-                    levels = levels,
-                    cmap = 'viridis_r')
-    cset2 = ax.contour(dates, depths, data.T, 
-                    levels = cset1.levels,
-                    colors = 'black')
-    
-    ax.invert_yaxis()
-    fig.colorbar(cset1, ax = ax, label = 'Soil Moisture [cm3/cm3]')
-    plt.title(str(df.SensorName[0]))
-
-
-    plt.savefig(save_path + "moistfig_heatmap" + str(df.SensorName[0]) + ".pdf")
-    plt.savefig(save_path + "moistfig" + str(df.SensorName[0]) + ".jpg")
-
-    plt.show()
-
 
 def snipPrecip(P, fir, la):
     #function trims the precip log to the specified dates, filling in NaNs where there is no available data
@@ -303,48 +161,118 @@ def clipTo(df, date):
     #date is the date to clip to
     return df[df.DateTime > pd.to_datetime(date)].reset_index()
 
-#%%
-'''Plots'''
-
-file_list = []
-for file in all_files:
-    df = pd.read_csv(file, 
-                     sep = ',',
-                     header = None, 
-                     names = ['DateTime', 'SensorAddress',
-                              'SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm', 
-                              'SoilTemp1', 'SoilTemp2', 'SoilTemp3', 'SoilTemp4', 'SoilTemp5', 'SoilTemp6'])
-    
-    df['SensorName'] = file[file.find('\S')+1:file.find('\S')+5]
-    
-    for i in range(0, len(df['DateTime'])):
-        #Converts to datetime format
-        df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
-        #Rounds to the nearest hour
-        df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
-
-    #Remove first month of data -- sensor stabilization
-    df = clipTo(df, '2022-12-01')
-    
-    #Plot soil moisture
-    plotMoisture(df, precip, S2Fmet, save_path)
-
-    #Plot soil temperature
-    plotTemp(df, precip, S2Fmet, save_path)
-
-    #plot soil temp heatmap
-    #plotTemp_Heatmap(df, save_path)
-
-    #plot soil moist heatmap
-    #plotMoisture_Heatmap(df, save_path)
-    
-    file_list.append(df)
-    
-#Concatenate all files in list
-sensor_data = pd.concat(file_list, axis = 0, ignore_index = True)
+def patch_breakpoints(signal, name, depth, breakpt_dict):
+    # patch spikes before & after -- assume that after is offset to match exactly before
+    signal_offset = signal.copy() # replicating water table series
+    ibefore = breakpt_dict[name][depth]['ibefore']
+    iafter = breakpt_dict[name][depth]['iafter']
+    fill_option= breakpt_dict[name][depth]['fill_opt']
+    # include an option to just keep water table where it is at the end of the recovery & only interpolate the breakpoint
+       
+    # automatically iterate over spikes to calculate offset and fix
+    if len(fill_option) == 0: 
+        fill_option = len(ibefore)*[0] # this defaults to interpolating
+        
+    for i, (ibef, iaft) in enumerate(zip(ibefore, iafter)):
+        
+        # linearly interpolate between before and after
+        if fill_option[i] == 0: 
+            iinterp = np.arange(ibef, iaft+1)
+            xp = [ibef, iaft]
+            fp = [signal_offset[ibef], signal_offset[iaft]]
+            signal_offset[iinterp] = np.interp(iinterp, xp, fp)
+            
+        # patch before and after by calculating offset 
+        if fill_option[i] == 1:    
+            offset = signal[iaft] - signal[ibef]
+            signal_offset[ibef:iaft] = signal_offset[ibef]
+            signal_offset[iaft:] = signal_offset[iaft:] - offset
+    return signal_offset
 
 #%%
-'''Plots - Bog'''
+'''Select a site'''
+
+#Process:
+# 1 - Select site 
+# 2 - Plot site data
+# 3 - Select data vector for cleaning by column name
+# 4 - Add values to the breakpoints dictionary
+# 5 - Gapfill 
+# 6 - Replace in dataframe
+# 7 - Plot again
+# 8 - Concat
+
+###############################
+#For compiling cleaned data
+cleanedFile_list = []
+
+#1 - Select site
+#Possible sites = ['S205', 'S215', 'S244', 'S254', 'S603', 'S613', 'S613', 'S622', 'S632']
+site = 'S215'
+file = np.extract([site in a for a in all_files], all_files)[0]
+
+#2 - Import and plot site data
+df = pd.read_csv(file, 
+                sep = ',',
+                header = None, 
+                names = ['DateTime', 'SensorAddress',
+                        'SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm', 
+                        'SoilTemp1', 'SoilTemp2', 'SoilTemp3', 'SoilTemp4', 'SoilTemp5', 'SoilTemp6'])
+    
+df['SensorName'] = site
+
+#Make a copy for saving cleaned data
+df_clean = df
+   
+for i in range(0, len(df['DateTime'])):
+    #Converts to datetime format
+    df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
+    #Rounds to the nearest hour
+    df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
+
+#Remove first month of data -- sensor stabilization
+df = clipTo(df, '2022-12-01')
+    
+#Plot soil moisture
+plotMoisture(df, precip, S2Fmet, save_path)
+
+#Plot soil temperature
+#plotTemp(df, precip, S2Fmet, save_path)
+
+#3 - Select data vector for cleaning
+for cleaning in ['SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm']:
+    cleanVec = df[cleaning]
+
+    #3.5 - Plot individual data
+    fig, ax = plt.subplots(1, 1, figsize = (6, 3))
+    ax.plot(cleanVec)
+    ax.set_xlim(min(cleanVec.index), max(cleanVec.index))
+    ax.set_title(site + ', ' + cleaning)
+
+    ###################################
+    # Pause to add values to dictionary
+    ###################################
+
+    #5 - Gapfill
+    logger_offset = patch_breakpoints(cleanVec.values, site, cleaning, moistpt_dict)
+
+    #6 - Save back to dataframe
+    df[cleaning] = logger_offset
+
+#7 - Replot
+plotMoisture(df_clean, precip, S2Fmet, save_path)
+
+#8 - Concat
+cleanedFile_list.append(df_clean)
+
+#%%
+'''Concatenate all data together and export'''
+sensor_data = pd.concat(cleanedFile_list, axis = 0, ignore_index = True)
+
+
+#%%
+'''
+#Plots - Bog
 ### Bog sensors
 bog_file_list = []
 for file in bog_files:
@@ -405,11 +333,11 @@ for site in set(bog_sensor_data.SensorName):
     plt.savefig(save_path + "tempfig" + str(data.SensorName[0]) + "_" + str(df.SensorDepth_cm[0]) + ".jpg")
 
     plt.show()
-#%%
 
-'''EXPORT CSV FILE'''
+#%%
+#EXPORT CSV FILE
 sensor_data.to_csv('./Cleaned Data/01_cleanedsensordata.csv')
-    
+''' 
 
 
 
