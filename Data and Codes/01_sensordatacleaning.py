@@ -207,7 +207,7 @@ def patch_breakpoints(signal, name, depth, breakpt_dict):
 cleanedFile_list = []
 
 #1 - Select site
-#Possible sites = ['S205', 'S215', 'S244', 'S254', 'S603', 'S613', 'S613', 'S622', 'S632']
+#Possible sites = ['S205', 'S215', 'S244', 'S254', 'S603', 'S613', 'S622', 'S632']
 site = 'S215'
 file = np.extract([site in a for a in all_files], all_files)[0]
 
@@ -238,6 +238,11 @@ plotMoisture(df, precip, S2Fmet, save_path)
 
 #Plot soil temperature
 #plotTemp(df, precip, S2Fmet, save_path)
+
+###################################
+# Pause to add values to dictionary
+###################################
+#%%
 
 #3 - Select data vector for cleaning
 for cleaning in ['SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm']:
