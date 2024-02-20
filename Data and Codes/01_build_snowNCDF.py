@@ -130,6 +130,18 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [0.5, 0.5, 2, 0.5, 0.5, 0.5],
             [np.nan, 0.5, 0.5, 1, 0.5, 0.5],
             [np.nan, np.nan, 0.5, 0.5, 0.5, 0.5],
+            [np.nan, np.nan, np.nan, 0.5, 0.5, 0.5]], 
+            [[np.nan, 0.5, 0.5, np.nan, np.nan, np.nan],
+            [0.5, 0.5, 0.5, 0.5, 0.5, np.nan],
+            [0.5, 0.5, 2, 0.5, 0.5, 0.5],
+            [np.nan, 0.5, 0.5, 1, 0.5, 0.5],
+            [np.nan, np.nan, 0.5, 0.5, 0.5, 0.5],
+            [np.nan, np.nan, np.nan, 0.5, 0.5, 0.5]], 
+            [[np.nan, 1, 2, np.nan, np.nan, np.nan],
+            [0.5, 0.5, 0.5, 1, 1, np.nan],
+            [0.5, 1, 4, 0.5, 1, 0.5],
+            [np.nan, 1, 0.5, 4, 0.5, 0.5],
+            [np.nan, np.nan, 0.5, 0.5, 2, 0.5],
             [np.nan, np.nan, np.nan, 0.5, 0.5, 0.5]]]
 
 data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
@@ -251,7 +263,19 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
             [0.5, 0.5, 2, 3, 0.5, 4, 0.5],
             [np.nan, np.nan, 1, 1, 6.5, 3, 2],
             [np.nan, np.nan, np.nan, 1, 1, 0.5, 0.5],
-            [np.nan, np.nan, np.nan, np.nan, 1, 0.5, np.nan]]]
+            [np.nan, np.nan, np.nan, np.nan, 1, 0.5, np.nan]], 
+            [[1, 0.5, 0.5, 0.5, 0.5, 0.5, np.nan], # <1 cm amounts were entered as 0.5
+            [np.nan, 2, 0.5, 2, 0.5, 0.5, np.nan],
+            [0.5, 0.5, 2, 3, 0.5, 4, 0.5],
+            [np.nan, np.nan, 1, 1, 6.5, 3, 2],
+            [np.nan, np.nan, np.nan, 1, 1, 0.5, 0.5],
+            [np.nan, np.nan, np.nan, np.nan, 1, 0.5, np.nan]], 
+            [[2, 1, 2, 1, 0.5, 0.5, np.nan],
+            [np.nan, 2, 0.5, 2, 1, 0.5, np.nan],
+            [1, 1, 3, 1, 2, 2, 0.5],
+            [np.nan, np.nan, 2, 1, 4, 4, 2],
+            [np.nan, np.nan, np.nan, 3, 2, 2, 2],
+            [np.nan, np.nan, np.nan, np.nan, 0.5, 2, np.nan]]]
 
 '''Times'''
 #Add dates as needed
@@ -260,7 +284,8 @@ times = np.array(['12-02-2022', '12-30-2022',
  '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
  '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
  '04-14-2023', '04-28-2023', '05-05-2023', '12-01-2023',
- '01-22-2024', '01-31-2024', '02-01-2024'])
+ '01-22-2024', '01-31-2024', '02-01-2024', '02-09-2024',
+ '02-15-2024'])
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
