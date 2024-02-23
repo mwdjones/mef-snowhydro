@@ -12,7 +12,7 @@ moistpt_dict = {'S205' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
                 'S215' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
-                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[3678, 7258], 'iafter':[3774, 7263], 'fill_opt':[0, 0]}, 
                           'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
                 'S244' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
@@ -22,16 +22,16 @@ moistpt_dict = {'S205' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':
                           'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
                 'S603' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
-                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[4502], 'iafter':[4506], 'fill_opt':[2]}}, 
                 'S613' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
-                'S622' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                'S622' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[2]}, 
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
-                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[6706], 'iafter':[6735], 'fill_opt':[2]}}, 
                 'S632' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
                           'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
-                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}}
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[7796], 'iafter':[8175], 'fill_opt':[2]}}}
 
 # Temperature breakpoints
 temppt_dict = {'S205' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 

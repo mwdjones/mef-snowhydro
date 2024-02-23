@@ -23,9 +23,6 @@ import os
 #For datetime 
 import datetime
 
-'''Patch Data'''
-from breakpts import moistpt_dict
-
 #%%
 
 '''PROBE DATA IMPORT'''
@@ -187,10 +184,18 @@ def patch_breakpoints(signal, name, depth, breakpt_dict):
             offset = signal[iaft] - signal[ibef]
             signal_offset[ibef:iaft] = signal_offset[ibef]
             signal_offset[iaft:] = signal_offset[iaft:] - offset
+
+        # just return NaNs
+        if fill_option[i] == 2:
+            signal_offset[ibef:iaft] = np.nan
+
     return signal_offset
 
 #%%
 '''Select a site'''
+
+'''Patch Data'''
+from breakpts import moistpt_dict
 
 #Process:
 # 1 - Select site 
@@ -207,68 +212,65 @@ def patch_breakpoints(signal, name, depth, breakpt_dict):
 cleanedFile_list = []
 
 #1 - Select site
-#Possible sites = ['S205', 'S215', 'S244', 'S254', 'S603', 'S613', 'S622', 'S632']
-site = 'S215'
-file = np.extract([site in a for a in all_files], all_files)[0]
+for site in ['S205', 'S215', 'S244', 'S254', 'S603', 'S613', 'S622', 'S632']:
+    file = np.extract([site in a for a in all_files], all_files)[0]
 
-#2 - Import and plot site data
-df = pd.read_csv(file, 
-                sep = ',',
-                header = None, 
-                names = ['DateTime', 'SensorAddress',
-                        'SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm', 
-                        'SoilTemp1', 'SoilTemp2', 'SoilTemp3', 'SoilTemp4', 'SoilTemp5', 'SoilTemp6'])
+    #2 - Import and plot site data
+    df = pd.read_csv(file, 
+                    sep = ',',
+                    header = None, 
+                    names = ['DateTime', 'SensorAddress',
+                            'SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm', 
+                            'SoilTemp1', 'SoilTemp2', 'SoilTemp3', 'SoilTemp4', 'SoilTemp5', 'SoilTemp6'])
+        
+    df['SensorName'] = site
     
-df['SensorName'] = site
+    for i in range(0, len(df['DateTime'])):
+        #Converts to datetime format
+        df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
+        #Rounds to the nearest hour
+        df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
 
-#Make a copy for saving cleaned data
-df_clean = df
-   
-for i in range(0, len(df['DateTime'])):
-    #Converts to datetime format
-    df.DateTime[i] = datetime.datetime.strptime(df.DateTime[i], dt_format)
-    #Rounds to the nearest hour
-    df.DateTime[i] = roundTime(df.DateTime[i], roundTo = 60*60)
+    #Remove first month of data -- sensor stabilization
+    df = clipTo(df, '2022-12-01')
+    df = df.reset_index()
+        
+    #Plot soil moisture
+    plotMoisture(df, precip, S2Fmet, save_path)
 
-#Remove first month of data -- sensor stabilization
-df = clipTo(df, '2022-12-01')
-    
-#Plot soil moisture
-plotMoisture(df, precip, S2Fmet, save_path)
-
-#Plot soil temperature
-#plotTemp(df, precip, S2Fmet, save_path)
-
-###################################
-# Pause to add values to dictionary
-###################################
-#%%
-
-#3 - Select data vector for cleaning
-for cleaning in ['SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm']:
-    cleanVec = df[cleaning]
-
-    #3.5 - Plot individual data
-    fig, ax = plt.subplots(1, 1, figsize = (6, 3))
-    ax.plot(cleanVec)
-    ax.set_xlim(min(cleanVec.index), max(cleanVec.index))
-    ax.set_title(site + ', ' + cleaning)
+    #Plot soil temperature
+    #plotTemp(df, precip, S2Fmet, save_path)
 
     ###################################
     # Pause to add values to dictionary
     ###################################
 
-    #5 - Gapfill
-    logger_offset = patch_breakpoints(cleanVec.values, site, cleaning, moistpt_dict)
 
-    #6 - Save back to dataframe
-    df[cleaning] = logger_offset
+    #Make a copy for saving cleaned data
+    df_clean = df
 
-#7 - Replot
-plotMoisture(df_clean, precip, S2Fmet, save_path)
+    #3 - Select data vector for cleaning
+    for cleaning in ['SoilMoist_15cm', 'SoilMoist_30cm', 'SoilMoist_45cm']:
+        cleanVec = df[cleaning]
 
-#8 - Concat
-cleanedFile_list.append(df_clean)
+        #5 - Gapfill
+        logger_offset = patch_breakpoints(cleanVec.values, site, cleaning, moistpt_dict)
+
+        #3.5 - Plot individual data
+        fig, ax = plt.subplots(1, 1, figsize = (6, 3))
+        ax.plot(cleanVec, label = 'Before')
+        ax.plot(logger_offset, label = 'After')
+        ax.set_xlim(min(cleanVec.index), max(cleanVec.index))
+        ax.set_title(site + ', ' + cleaning)
+
+        #6 - Save back to dataframe
+        df_clean[cleaning] = logger_offset
+
+    #7 - Replot
+    plotMoisture(df_clean, precip, S2Fmet, save_path)
+
+    #8 - Concat
+    cleanedFile_list.append(df_clean)
 
 #%%
 '''Concatenate all data together and export'''
