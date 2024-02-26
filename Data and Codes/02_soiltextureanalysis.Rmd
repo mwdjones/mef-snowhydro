@@ -57,7 +57,6 @@ textDat = data.frame(
  ) 
 ```
 
-
 ```{r}
 #Classify soil texture data
 classDat = data.frame(TT.points.in.classes(
@@ -83,4 +82,19 @@ head(classDat)
 #Merge back with original data
 dat = merge(classDat, soils, by = "Label", sort = TRUE)
 dat
+```
+
+
+```{r}
+#Calculate Soil Hydraulic Characteristics
+#Using: K.E. Saxton et al., 1986, Estimating generalized soil-water characteristics from texture. Soil Sci. Soc. Amer. J. 50(4):1031-1036
+
+
+
+```
+
+
+```{r}
+#Export Data
+write.csv(dat, paste0(load_path, "soilValues_calculated.csv"), row.names = FALSE)
 ```
