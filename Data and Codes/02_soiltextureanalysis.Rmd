@@ -19,6 +19,7 @@ library(soiltexture)
 library(dplyr)
 library(tidyverse)
 library(reshape2)
+library(ggplot2)
 ```
 
 
@@ -87,9 +88,9 @@ dat
 
 ```{r}
 #Calculate Soil Hydraulic Characteristics
-#Using: K.E. Saxton et al., 1986, Estimating generalized soil-water characteristics from texture. Soil Sci. Soc. Amer. J. 50(4):1031-1036
-
-
+dat['satMatricPot'] = -1.58*(dat$X.Sand/100) - 0.63*(dat$X.Clay/100) + 2.17
+dat['satMoistContent'] = -14.2*(dat$X.Sand/100) - 3.7*(dat$X.Clay/100) + 50.5
+dat['slope'] = -0.3*(dat$X.Sand/100) + 15.7*(dat$X.Clay/100) + 3.10
 
 ```
 
