@@ -11,7 +11,13 @@ import pandas as pd
 
 '''Data'''
 #Add data for each sampling date
-data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
+data_s6 = [[[np.nan, 0, 0, np.nan, np.nan, np.nan],
+            [0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0],
+            [np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0]],
+            [[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [0, 3, 0, 5, 5, np.nan],
             [0, 7.5, 15, 0, 0, 0],
             [np.nan, 2, 6, 10, 0, 0],
@@ -198,7 +204,13 @@ data_s6 = [[[np.nan, 5.5, 8, np.nan, np.nan, np.nan],
             [np.nan, np.nan, 0, 0, 0, 0],
             [np.nan, np.nan, np.nan, 0, 0, 0]]]
 
-data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
+data_s2 = [[[0, 0, 0, 0, 0, 0, np.nan],
+            [np.nan, 0, 0, 0, 0, 0, np.nan],
+            [0, 0, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, 0, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]],
+            [[5, 10, 0, 8.5, 0, 3, np.nan],
             [np.nan, 11, 5, 19, 13, 11, np.nan], # S214 interpolated (13)
             [14.5, 5, 14, 14.5, 5, 8, 8.5],
             [np.nan, np.nan, 9, 10, 9.5, 14, 11],
@@ -387,7 +399,7 @@ data_s2 = [[[5, 10, 0, 8.5, 0, 3, np.nan],
 
 '''Times'''
 #Add dates as needed
-times = np.array(['12-02-2022', '12-30-2022',
+times = np.array(['11-25-2022', '12-02-2022', '12-30-2022',
  '01-05-2023', '01-13-2023', '01-20-2023',
  '02-01-2023', '02-10-2023', '02-17-2023', '02-24-2023', 
  '03-09-2023', '03-17-2023', '03-24-2023', '03-31-2023', 
