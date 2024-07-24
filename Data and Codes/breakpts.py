@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 10 10:52:03 2021
+
+@author: xuefeng
+"""
+# fill_options: 0 - default; linearly interpolate between before and after; 1: patch before and after by calculating offset
+
+# Moisture breakpoints
+moistpt_dict = {'S205' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S215' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[3678, 7258], 'iafter':[3774, 7263], 'fill_opt':[0, 0]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S244' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S254' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S603' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[4502], 'iafter':[4506], 'fill_opt':[2]}}, 
+                'S613' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S622' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S632' : {'SoilMoist_15cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_30cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilMoist_45cm': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}}
+
+# Temperature breakpoints
+temppt_dict = {'S205' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S215' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S244' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S254' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S603' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S613' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S622' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}, 
+                'S632' : {'SoilTemp1': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp2': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp3': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp4': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}, 
+                          'SoilTemp5': {'istart':0, 'ibefore':[], 'iafter':[], 'fill_opt':[]}}}

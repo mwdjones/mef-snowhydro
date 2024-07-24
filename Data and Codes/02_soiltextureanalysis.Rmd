@@ -1,0 +1,101 @@
+---
+title: "Soil Texture Analysis"
+author: "Mariel Jones"
+date: "2024-02-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+fig_save = "./Figures/soilPlots/"
+load_path = "./Data and Codes/Cleaned Data/"
+```
+
+```{r}
+library(soiltexture)
+library(dplyr)
+library(tidyverse)
+library(reshape2)
+library(ggplot2)
+```
+
+
+```{r}
+#Import Soil Texture Data
+soils = read.csv(paste0(load_path, "Kalla_MEFSoil_Fall2023_Data.csv"), 
+                    blank.lines.skip = TRUE)
+
+soils = soils %>%
+    mutate(Watershed = as.integer((substr(soils$Stake, 2, 2))))
+
+head(soils)
+```
+
+```{r}
+#Plot all texture data
+textDat = data.frame(
+    "CLAY" = soils$X.Clay, 
+    "SILT" = soils$X.Silt, 
+    "SAND" = soils$X.Sand, 
+    "LABEL" = soils$Label, 
+    "WATERSHED" = soils$Watershed)
+
+ TT.plot(
+ class.sys = "USDA.TT",
+ tri.data = textDat,
+ z.name = "WATERSHED",
+ z.cex.range = c(2, 2),
+ z.col.hue = 0.57,
+ z.pch = 20,
+ grid.show = FALSE,
+ frame.bg.col = NA,
+ col.axis = 'snow3',
+ col.lab = 'snow3',
+ main = " "
+ ) 
+```
+
+```{r}
+#Classify soil texture data
+classDat = data.frame(TT.points.in.classes(
+    tri.data = textDat, 
+    class.sys = "USDA.TT", 
+    PiC.type = 'l'
+))
+classDat$LABEL = textDat$LABEL
+
+#Reshape into useful format
+classDat_short = melt(classDat, id = 'LABEL')
+
+classDat = subset(classDat_short, value == TRUE) 
+classDat = subset(classDat, select = -c(3))
+colnames(classDat)[2] <- 'Class'
+colnames(classDat)[1] <- 'Label'
+row.names(classDat) <- NULL
+
+head(classDat)
+```
+
+```{r}
+#Merge back with original data
+dat = merge(classDat, soils, by = "Label", sort = TRUE)
+dat
+```
+
+
+```{r}
+#Calculate Soil Hydraulic Characteristics
+dat['satMatricPot'] = -1.58*(dat$X.Sand/100) - 0.63*(dat$X.Clay/100) + 2.17
+dat['satMoistContent'] = -14.2*(dat$X.Sand/100) - 3.7*(dat$X.Clay/100) + 50.5
+dat['slope'] = -0.3*(dat$X.Sand/100) + 15.7*(dat$X.Clay/100) + 3.10
+
+```
+
+
+```{r}
+#Export Data
+write.csv(dat, paste0(load_path, "soilValues_calculated.csv"), row.names = FALSE)
+```
