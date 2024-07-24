@@ -18,7 +18,7 @@ import datetime
 #%%
 
 '''IMPORT LAI DATA'''
-filepath = "D:/1_DesktopBackup/Feng Research/0_MEF Snow Hydology/mef-snowhydro/Data and Codes/Raw Data/"
+filepath = "./Data and Codes/Raw Data/"
 
 #S2
 s2LAI_import = pd.read_csv(filepath + "S2_winterLAI.txt", sep = ';')
