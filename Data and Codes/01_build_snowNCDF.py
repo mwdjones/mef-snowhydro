@@ -202,7 +202,103 @@ data_s6 = [[[np.nan, 0, 0, np.nan, np.nan, np.nan],
             [0, 0, 0, 0, 0, 0],
             [np.nan, 0, 0, 0, 0, 0],
             [np.nan, np.nan, 0, 0, 0, 0],
-            [np.nan, np.nan, np.nan, 0, 0, 0]]]
+            [np.nan, np.nan, np.nan, 0, 0, 0]], 
+            [[np.nan, 9, 10, np.nan, np.nan, np.nan], #12/04/2024
+            [11, 11, 8, 9, 10, np.nan],
+            [7, 10, 15, 9, 9, 7],
+            [np.nan, 10, 10, 9, 7, 8],
+            [np.nan, np.nan, 7, 8, 10, 8],
+            [np.nan, np.nan, np.nan, 6, 8, 5]], 
+            [[np.nan, 12, 16, np.nan, np.nan, np.nan], #12/20/2024
+            [10, 16, 15, 14, 16, np.nan],
+            [14, 17, 23, 10, 8, 9],
+            [np.nan, 17, 15, 22, 8, 7],
+            [np.nan, np.nan, 7, 13, 11, 11],
+            [np.nan, np.nan, np.nan, 9, 12, 8]], 
+            [[np.nan, 10, 12, np.nan, np.nan, np.nan], #01/06/2025
+            [6, 11, 10, 10, 10, np.nan],
+            [10, 11, 18, 8, 8, 7],
+            [np.nan, 15, 11, 15, 5, 8],
+            [np.nan, np.nan, 7, 10, 12, 7],
+            [np.nan, np.nan, np.nan, 5, 8, 5]], 
+            [[np.nan, 10, 12, np.nan, np.nan, np.nan], #01/10/2025
+            [8, 14, 11, 11, 10, np.nan],
+            [10, 13, 18, 10, 11, 8],
+            [np.nan, 18, 12, 19, 6, 10],
+            [np.nan, np.nan, 7, 12, 21, 7],
+            [np.nan, np.nan, np.nan, 6, 8, 6]],
+            [[np.nan, 15, 20, np.nan, np.nan, np.nan], #01/17/2025
+            [13, 17, 14, 17, 16, np.nan],
+            [15, 16, 25, 12, 12, 11],
+            [np.nan, 24, 18, 22, 10, 13],
+            [np.nan, np.nan, 11, 16, 23, 12],
+            [np.nan, np.nan, np.nan, 10, 13, 9]], 
+            [[np.nan, 20, 23, np.nan, np.nan, np.nan], #01/24/2025
+            [18, 20, 18, 19, 22, np.nan],
+            [20, 23, 32, 17, 16, 15],
+            [np.nan, 23, 22, 22, 13, 15],
+            [np.nan, np.nan, 13, 17, 27, 13],
+            [np.nan, np.nan, np.nan, 12, 16, 13]], 
+            [[np.nan, 19, 23, np.nan, np.nan, np.nan], #01/30/2025
+            [11, 19, 16, 16, 19, np.nan],
+            [19, 20, 29, 15, 15, 12],
+            [np.nan, 25, 23, 23, 9, 15],
+            [np.nan, np.nan, 11, 18, 26, 14],
+            [np.nan, np.nan, np.nan, 10, 17, 11]], 
+            [[np.nan, 28, 37, np.nan, np.nan, np.nan], #02/07/2025
+            [24, 32, 30, 30, 32, np.nan],
+            [29, 31, 35, 25, 24, 23],
+            [np.nan, 38, 33, 31, 23, 22],
+            [np.nan, np.nan, 19, 29, 41, 24],
+            [np.nan, np.nan, np.nan, 20, 25, 20]], 
+            [[np.nan, 29, 33, np.nan, np.nan, np.nan], #02/14/2025
+            [21, 29, 27, 26, 29, np.nan],
+            [26, 30, 36, 23, 23, 23],
+            [np.nan, 34, 33, 44, 18, 23],
+            [np.nan, np.nan, 18, 30, 35, 22],
+            [np.nan, np.nan, np.nan, 15, 23, 19]],
+            [[np.nan, 27, 34, np.nan, np.nan, np.nan], #2/21/2025
+            [24, 30, 28, 28, 33, np.nan],
+            [26, 32, 36, 26, 24, 21],
+            [np.nan, 40, 34, 38, 20, 25],
+            [np.nan, np.nan, 19, 30, 35, 21],
+            [np.nan, np.nan, np.nan, 19, 25, 22]], 
+            [[np.nan, 12, 16, np.nan, np.nan, np.nan], #03/07/2025
+            [7, 11, 12, 7, 12, np.nan],
+            [7, 14, 22, 6, 6, 10],
+            [np.nan, 20, 21, 20, 3, 13],
+            [np.nan, np.nan, 3, 14, 26, 1],
+            [np.nan, np.nan, np.nan, 9.5, 11, 7]], 
+            [[np.nan, 7, 10, np.nan, np.nan, np.nan], #3/13/2025
+            [0, 0, 0, 3, 13, np.nan],
+            [0, 8, 23, 0, 0, 3],
+            [np.nan, 13, 9, 17, 0, 4],
+            [np.nan, np.nan, 0, 11, 18, 0],
+            [np.nan, np.nan, np.nan, 0, 2, 0]],
+            [[np.nan, 4, 2, np.nan, np.nan, np.nan], #03/20/2025
+            [0, 0, 0, 0, 5, np.nan],
+            [0, 0.5, 17, 0, 0, 1],
+            [np.nan, 4, 1, 13, 0, 0.5],
+            [np.nan, np.nan, 0.5, 1, 16, 0],
+            [np.nan, np.nan, np.nan, 0, 0.5, 1]],
+            [[np.nan, 3, 0, np.nan, np.nan, np.nan], #03/27/2025
+            [0, 0, 0, 0, 3, np.nan],
+            [0, 0, 10, 0, 0, 0.5],
+            [np.nan, 3, 0, 20, 0, 0],
+            [np.nan, np.nan, 0, 0.5, 10, 0],
+            [np.nan, np.nan, np.nan, 0, 0.5, 0]],
+            [[np.nan, 7, 9, np.nan, np.nan, np.nan], #04/04/2025
+            [9, 10, 8, 7, 10, np.nan],
+            [8, 7, 12, 7, 8, 6],
+            [np.nan, 8, 7, 19, 5, 8],
+            [np.nan, np.nan, 6, 8, 11, 8],
+            [np.nan, np.nan, np.nan, 8, 10, 5]],
+            [[np.nan, 5, 0, np.nan, np.nan, np.nan], #04/10/2025
+            [0, 0, 0, 3, 5, np.nan],
+            [0, 3, 7, 0, 1, 2],
+            [np.nan, 3, 2, 18, 0, 4],
+            [np.nan, np.nan, 0.5, 2, 8, 0],
+            [np.nan, np.nan, np.nan, 0.5, 5, 1]]]
 
 data_s2 = [[[0, 0, 0, 0, 0, 0, np.nan],
             [np.nan, 0, 0, 0, 0, 0, np.nan],
@@ -395,6 +491,102 @@ data_s2 = [[[0, 0, 0, 0, 0, 0, np.nan],
             [0, 0, 0, 0, 0, 0, 0],
             [np.nan, np.nan, 0, 0, 0, 0, 0],
             [np.nan, np.nan, np.nan, 0, 0, 0, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]], 
+            [[12, 10, 11, 9, 6, 10, np.nan], #12/4/2024
+            [np.nan, 11, 7, 12, 10, 11, np.nan],
+            [11, 8, 11, 8, 10, 10, 11],
+            [np.nan, np.nan, 9, 9, 15, 11, 11],
+            [np.nan, np.nan, np.nan, 10, 8, 11, 10],
+            [np.nan, np.nan, np.nan, np.nan, 11, 9, np.nan]],
+            [[15, 15, 20, 12, 7, 16, np.nan], #12/20/24
+            [np.nan, 19, 11, 23, 16, 24, np.nan],
+            [16, 13, 20, 22, 16, 22, 18],
+            [np.nan, np.nan, 15, 18, 28, 23, 17],
+            [np.nan, np.nan, np.nan, 19, 19, 20, 15],
+            [np.nan, np.nan, np.nan, np.nan, 19, 9.5, np.nan]], #9.5 interpolated
+            [[12, 11, 9, 10, 4, 12, np.nan], #1/6/2025
+            [np.nan, 13, 9, 15, 10, 15, np.nan],
+            [15, 10, 17, 16, 13, 15, 13],
+            [np.nan, np.nan, 12, 13, 15, 22, 11],
+            [np.nan, np.nan, np.nan, 12, 13, 15, 12],
+            [np.nan, np.nan, np.nan, np.nan, 13, 10, np.nan]],
+            [[14, 15, 11, 13, 6, 10, np.nan], #1/10/2025
+            [np.nan, 13, 9, 21, 13, 16, np.nan],
+            [14, 7, 18, 21, 14, 18, 16],
+            [np.nan, np.nan, 16, 14, 22, 22, 14],
+            [np.nan, np.nan, np.nan, 16, 14, 15, 16],
+            [np.nan, np.nan, np.nan, np.nan, 17, 12, np.nan]],
+            [[18, 16, 18, 13, 9, 21, np.nan], #1/17/2025
+            [np.nan, 20, 16, 20, 17, 24, np.nan],
+            [17, 10, 27, 26, 20, 19, 18],
+            [np.nan, np.nan, 17, 22, 25, 27, 19],
+            [np.nan, np.nan, np.nan, 18, 28, 21, 20],
+            [np.nan, np.nan, np.nan, np.nan, 21, 17, np.nan]],
+            [[21, 19, 24, 20, 11, 21, np.nan], #1/24/2025
+            [np.nan, 25, 15, 25, 20, 28, np.nan],
+            [24, 18, 26, 24, 23, 23, 22],
+            [np.nan, np.nan, 22, 24, 28, 32, 24],
+            [np.nan, np.nan, np.nan, 23, 23, 28, 23],
+            [np.nan, np.nan, np.nan, np.nan, 25, 20, np.nan]],
+            [[20, 18, 21, 17, 10, 20, np.nan], #1/30/25
+            [np.nan, 24, 17, 27, 22, 25, np.nan],
+            [19, 14, 27, 28, 17, 23, 22],
+            [np.nan, np.nan, 21, 25, 24, 32, 24],
+            [np.nan, np.nan, np.nan, 21, 21, 24, 21],
+            [np.nan, np.nan, np.nan, np.nan, 23, 22, np.nan]],
+            [[33, 31, 37, 33, 23, 35, np.nan], #2/7/2025
+            [np.nan, 36, 27, 38, 33, 40, np.nan],
+            [35, 28, 33, 39, 32, 38, 34],
+            [np.nan, np.nan, 36, 36, 44, 49, 34],
+            [np.nan, np.nan, np.nan, 37, 36, 33, 35],
+            [np.nan, np.nan, np.nan, np.nan, 35, 35, np.nan]],
+            [[32, 29, 33, 36, 18, 29, np.nan], #2/14/2025
+            [np.nan, 35, 25, 31, 32, 37, np.nan],
+            [33, 21, 37, 43, 32, 31, 30],
+            [np.nan, np.nan, 34, 31, 41, 43, 33],
+            [np.nan, np.nan, np.nan, 35, 34, 34, 30],
+            [np.nan, np.nan, np.nan, np.nan, 34, 26, np.nan]], 
+            [[33, 32, 36, 29, 18, 31, np.nan], #2/21/2025
+            [np.nan, 35, 28, 37, 32, 37, np.nan],
+            [34, 27, 36, 42, 35, 36, 36],
+            [np.nan, np.nan, 34, 36, 40, 43, 35],
+            [np.nan, np.nan, np.nan, 34, 38, 33, 33],
+            [np.nan, np.nan, np.nan, np.nan, 36, 29, np.nan]],
+            [[14, 9, 19, 14, 1, 14, np.nan], #3/7/2025
+            [np.nan, 21, 13, 28, 16, 22, np.nan],
+            [19, 15, 17, 26, 13, 19, 18],
+            [np.nan, np.nan, 21, 16, 30, 28, 17],
+            [np.nan, np.nan, np.nan, 20, 25, 26, 17],
+            [np.nan, np.nan, np.nan, np.nan, 17, 18, np.nan]],
+            [[10, 7, 15, 6, 0, 10, np.nan], #3/13/2025
+            [np.nan, 18, 5, 25, 8, 10, np.nan],
+            [9, 2, 21, 17, 13, 19, 18],
+            [np.nan, np.nan, 11, 9, 21, 28, 17], #21 interp
+            [np.nan, np.nan, np.nan, 15, 19, 11, 17],
+            [np.nan, np.nan, np.nan, np.nan, 9, 8, np.nan]],
+            [[0, 0, 0, 0, 0, 0.5, np.nan], #3/20/2025
+            [np.nan, 5, 0, 11, 0.5, 0.5, np.nan],
+            [4, 0, 6, 7, 8, 13, 0],
+            [np.nan, np.nan, 7, 15, 12, 15, 1],
+            [np.nan, np.nan, np.nan, 6, 6, 4, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0.5, 0.5, np.nan]],
+            [[0, 0, 0, 0, 0, 0, np.nan], #3/27/2025
+            [np.nan, 5, 0, 13, 0, 0, np.nan],
+            [0, 0, 5, 10, 9, 0, 0],
+            [np.nan, np.nan, 8, 9, 5, 14, 0],
+            [np.nan, np.nan, np.nan, 0.5, 7, 7, 0],
+            [np.nan, np.nan, np.nan, np.nan, 0, 4.75, np.nan]], #4.75 is interpolated
+            [[0, 0, 0, 7, 7, 10, np.nan], #04/4/2025, 0s are interpolated
+            [np.nan, 8, 8, 12, 9, 10, np.nan],
+            [0, 8, 10, 10, 8, 9, 8], #0 is interpolated
+            [np.nan, np.nan, 7, 7, 8, 15, 9],
+            [np.nan, np.nan, np.nan, 8, 12, 10, 8],
+            [np.nan, np.nan, np.nan, np.nan, 7, 10, np.nan]], 
+            [[0, 0, 0, 0, 2, 2, np.nan], #04/10/2025
+            [np.nan, 0, 2, 5, 0, 0, np.nan],
+            [0, 4, 6, 10, 5, 5, 0],
+            [np.nan, np.nan, 3, 7, 0, 8, 0],
+            [np.nan, np.nan, np.nan, 0, 4, 0, 0],
             [np.nan, np.nan, np.nan, np.nan, 0, 0, np.nan]]]
 
 '''Times'''
@@ -407,7 +599,11 @@ times = np.array(['11-25-2022', '12-02-2022', '12-30-2022',
  '01-22-2024', '01-31-2024', '02-01-2024', '02-09-2024',
  '02-15-2024', '02-21-2024', '03-01-2024', '03-06-2024', 
  '03-13-2024', '03-21-2024', '03-29-2024', '04-03-2024', 
- '04-11-2024', '04-19-2024']) 
+ '04-11-2024', '04-19-2024', 
+ '12-04-2024', '12-20-2024', '01-06-2025', '01-10-2025', 
+ '01-17-2025', '01-24-2025', '01-30-2025', '02-07-2025',
+ '02-14-2024', '02-21-2025', '03-07-2025', '03-13-2025', 
+ '03-20-2025', '03-27-2025', '04-04-2025', '04-10-2025']) 
 
 '''Dims'''
 #These are averaged from the stake coordinates to make the data fit a grid system
