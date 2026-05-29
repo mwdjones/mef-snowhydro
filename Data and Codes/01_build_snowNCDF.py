@@ -610,7 +610,21 @@ times = np.array(['11-25-2022', '12-02-2022', '12-30-2022',
 Northing_s6 = np.array(np.linspace(464644, 464335, 6))
 Easting_s6 = np.array(np.linspace(5262240, 5263285, 6))
 
-stakes_s6 = [[np.nan, 'S655', 'S654', np.nan, np.nan, np.nan],
+stakes_s6 = [[np.nan, -93.472876, -93.472239, np.nan, np.nan, np.nan],
+            [-93.473668, -93.472898, -93.472114, -93.471344, -93.470533, np.nan],
+            [-93.473742, -93.472985, -93.472175, -93.471365, -93.470515, -93.469744],
+            [np.nan, -93.472927, -93.472211, -93.47128, -93.470324, -93.469633],
+            [np.nan, np.nan, -93.472112, -93.471354, -93.472245, -93.473135],
+            [np.nan, np.nan, np.nan, -93.471257, -93.470394, -93.469731]]
+
+lat_s6 = [[np.nan, 47.521954, 47.52202, np.nan, np.nan, np.nan],
+            [47.521429, 47.52145, 47.521481, 47.521466, 47.52146, np.nan],
+            [47.520808, 47.520856, 47.520886, 47.520917, 47.520848, 47.520779],
+            [np.nan, 47.520298, 47.520373, 47.520287, 47.520363, 47.520276],
+            [np.nan, np.nan, 47.519735, 47.519693, 47.519752, 47.519821],
+            [np.nan, np.nan, np.nan, 47.519244, 47.51922, 47.519331]]
+
+lon_s6 = [[np.nan, 'S655', 'S654', np.nan, np.nan, np.nan],
             ['S646', 'S645', 'S644', 'S643', 'S642', np.nan],
             ['S636', 'S635', 'S634', 'S633', 'S632', 'S631'],
             [np.nan, 'S625', 'S624', 'S623', 'S622', 'S621'],
@@ -649,6 +663,20 @@ stakes_s2 = [['S200', 'S201', 'S202', 'S203', 'S204', 'S205', np.nan],
             [np.nan, np.nan, np.nan, 'S243', 'S244', 'S245', 'S246'],
             [np.nan, np.nan, np.nan, np.nan, 'S254', 'S255', np.nan]]
 
+lat_s2 = [[47.515147, 47.515294, 47.515423, 47.51539, 47.515177, 47.515216, np.nan],
+            [np.nan, 47.514807, 47.514882, 47.51485, 47.514817, 47.514794, np.nan],
+            [47.514264, 47.514223, 47.514388, 47.514256, 47.514313, 47.51429, 47.514302],
+            [np.nan, np.nan, 47.513731, 47.51377, 47.513729, 47.513777, 47.513699],
+            [np.nan, np.nan, np.nan, 47.513203, 47.513242, 47.513165, 47.513105],
+            [np.nan, np.nan, np.nan, np.nan, 47.51264, 47.512634, np.nan]]
+
+lon_s2 = [[-93.471885, -93.471195, -93.470493, -93.469775, -93.468923, -93.468127, np.nan],
+            [np.nan, -93.471324, -93.470554, -93.469704, -93.46888, -93.468096, np.nan],
+            [-93.472103, -93.471159, -93.470523, -93.469699, -93.468862, -93.468105, -93.467295],
+            [np.nan, np.nan, -93.470504, -93.469708, -93.46887, -93.468061, -93.46725],
+            [np.nan, np.nan, np.nan, -93.469716, -93.468933, -93.468055, -93.467377],
+            [np.nan, np.nan, np.nan, np.nan, -93.468927, -93.468183, np.nan]]
+
 zones_s2 = [['Upland', 'Upland', 'Upland', 'Upland', 'Upland', 'Upland', np.nan],
             [np.nan, 'Lagg', 'Lagg', 'Bog', 'Upland', 'Upland', np.nan],   
             ['Upland', 'Bog', 'Bog', 'Bog', 'Lagg', 'Lagg', 'Upland'],
@@ -674,6 +702,8 @@ slope_s2 = [[6.632267, 3.120716, 2.16637, 7.45287, 9.503919, 3.051387, np.nan],
 
 snow_s6 = xr.Dataset(
     data_vars = {"stakes": (["northing", "easting"], stakes_s6),
+                 "latitude": (["northing", "easting"], lat_s6),
+                 "longitude": (["northing", "easting"], lon_s6),
                  "zones": (["northing", "easting"], zones_s6),
                  "aspect": (["northing", "easting"], aspect_s6),
                  "slope": (["northing", "easting"], slope_s6),
@@ -689,10 +719,13 @@ snow_s6 = xr.Dataset(
 
 snow_s2 = xr.Dataset(
     data_vars = {"stakes": (["northing", "easting"], stakes_s2),
+                 "latitude": (["northing", "easting"], lat_s2),
+                 "longitude": (["northing", "easting"], lon_s2),
                  "zones": (["northing", "easting"], zones_s2),
                  "aspect": (["northing", "easting"], aspect_s2),
                  "slope": (["northing", "easting"], slope_s2),
                  "depths": (["time", "northing", "easting"], data_s2),
+                 
     },
     coords={
         "time": times,
